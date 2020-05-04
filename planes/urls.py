@@ -1,11 +1,13 @@
 from django.urls import path, include
-from planes import views
-from django.contrib.auth import urls
+from .views import (
+    index,
+    login_view,
+    logout_view,
+    planig_view,
+)
+
 
 urlpatterns = [
-    path('', views.index),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-   # path('register/', views.register_view, name='register')
-
+    path('', index),
+    path('planing/', planig_view, name='planing')
 ]

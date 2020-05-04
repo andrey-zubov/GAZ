@@ -8,6 +8,8 @@ from django.contrib.auth.decorators import login_required
 def index(request):
     return render(request, 'planes/index.html')
 
+
+@login_required
 def logout_view(request):
     logout(request)
     return render(request, 'planes/index.html')
@@ -32,3 +34,10 @@ def login_view(request,):
     else:
         form = LoginForm()
     return render(request, 'registration/login.html', {'form': form})
+
+
+@login_required
+def planig_view(request):
+    return HttpResponse('здесь будет город-планирование')
+
+
