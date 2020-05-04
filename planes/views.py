@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
+from .models import FinanceCosts
+from django.views import View
 
 @login_required
 def index(request):
@@ -33,11 +35,11 @@ def login_view(request,):
                 return redirect('/login/')
     else:
         form = LoginForm()
-    return render(request, 'registration/login.html', {'form': form})
+    return render(request, template_name='registration/login.html', context={'form': form})
 
 
 @login_required
-def planig_view(request):
-    return HttpResponse('здесь будет город-планирование')
+def planing_finance_costs(request):
+    fin_costs = FinanceCosts.objects.all()
 
-
+    return render(request, template_name='planes/fin_costs.html', context={'fin_costs':fin_costs})

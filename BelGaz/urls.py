@@ -9,5 +9,5 @@ urlpatterns = [
     path("schema/", Schema.as_view()),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
-    path('planing/', include('planes.urls')),
+    path('planning/', include('planes.urls')),
 ]

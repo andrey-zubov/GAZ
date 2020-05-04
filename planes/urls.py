@@ -1,13 +1,13 @@
 from django.urls import path, include
 from .views import (
     index,
-    login_view,
-    logout_view,
-    planig_view,
+    planing_finance_costs,
+
 )
 
 
 urlpatterns = [
     path('', index),
-    path('planing/', planig_view, name='planing')
+    path('plans/', planing_finance_costs, name='plans'),
+
 ]
