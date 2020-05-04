@@ -12,6 +12,11 @@ class Curator(models.Model):
         verbose_name="Куратор"
     )
 
+    def __str__(self):
+        try:
+            return str(self.title)
+        except:
+            return 'Ошибка в данных'
 
 class UserTypes(models.Model):
     class Meta:
@@ -385,6 +390,8 @@ class SumsBYN(models.Model):
 
 
 class Planning(models.Model):
+    class QuartChoices:
+        ch = [(1, 'I'), (2, 'II'), (2, 'III'), (4, 'IV')]
     class Meta:
         verbose_name = "План"
         verbose_name_plural = "Планы"
@@ -419,7 +426,8 @@ class Planning(models.Model):
 
     def __str__(self):
         try:
-            return 'Планирование по ст %s на %s год' % (self.FinanceCosts, self.year)
+            return ('Планирование по ст %s на %s год, куратор %s'
+                    % (self.FinanceCosts, self.year, self.curator))
         except:
             return 'Ошибка в данных'
 

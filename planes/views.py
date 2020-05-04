@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
 from .models import FinanceCosts, Planning
-
+from datetime import datetime
 
 @login_required
 def index(request):
@@ -39,6 +39,15 @@ def login_view(request,):
 
 
 @login_required
-def planing_finance_costs(request):
-    fin_costs = FinanceCosts.objects.all()
-    return render(request, template_name='planes/fin_costs.html', context={'fin_costs':fin_costs})
+def planing_finance_costs(request):\
+    # здесь будут суммы поквартально и итог
+    # здесь будет выбор года отображения
+    plans = Planning.objects.all()
+    this_year = datetime.today()
+    filtered_plans = Planning.objects.filter(year=this_year)
+    return render(request,
+                  template_name='planes/fin_costs.html',
+                  context={'plans':plans,
+                           'this_year':this_year,
+                           'filtered_plans':filtered_plans,
+                           })

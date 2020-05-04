@@ -14,16 +14,63 @@
         <th>4 квартал</th>
         <th>Итого</th>
     </tr>
-    {% for cost in fin_costs %}
-        <tr>
-            <td><a href="#">{{ cost }}</a></td>
-            <td>xxx</td>
-            <td>xxx</td>
-            <td>xxx</td>
-            <td>xxx</td>
-            <td>xxx</td>
-        </tr>
-    {% endfor %}
+
+    <tr>
+        <td><a href="#">ТОиТР</a></td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+    </tr>
+
+    <tr>
+        <td><a href="#">ДО</a></td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+    </tr>
+
+    <tr>
+        <td><a href="#">Услуги</a></td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+    </tr>
+
+    <tr>
+        <td><a href="#">КР</a></td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+    </tr>
+
+    <tr>
+        <td><a href="#">МТР для КР</a></td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+        <td>xxx</td>
+    </tr>
 </table>
+
+<hr>
+ТЕСТ<br>
+{% for plan in plans %}
+    {{ plan }}<br>
+{% endfor %}
+<br>
+фильтр:
+<br>
+{% for f_plan in filtered_plans %}
+    {{ f_plan }}
+{% endfor %}
 </body>
 </html>
