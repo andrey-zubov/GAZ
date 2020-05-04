@@ -3,8 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
-from .models import FinanceCosts
-from django.views import View
+from .models import FinanceCosts, Planning
+
 
 @login_required
 def index(request):
@@ -41,5 +41,4 @@ def login_view(request,):
 @login_required
 def planing_finance_costs(request):
     fin_costs = FinanceCosts.objects.all()
-
     return render(request, template_name='planes/fin_costs.html', context={'fin_costs':fin_costs})

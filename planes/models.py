@@ -98,10 +98,20 @@ class UserActivityJournal(models.Model):
 
 
 class FinanceCosts(models.Model):
+    class Meta:
+        verbose_name = "Статья финансирования"
+        verbose_name_plural = "Статьи финансирования"
     title = models.CharField(
         verbose_name="Название статьи",
         max_length=100
     )
+
+    def __str__(self):
+        try:
+            return str(self.title)
+        except:
+            return 'Ошибка в данных'
+
 
 
 class PurchaseType(models.Model):
@@ -375,6 +385,10 @@ class SumsBYN(models.Model):
 
 
 class Planning(models.Model):
+    class Meta:
+        verbose_name = "План"
+        verbose_name_plural = "Планы"
+
     FinanceCosts = models.ForeignKey(
         FinanceCosts,
         verbose_name="Статья финансирования",
@@ -402,5 +416,13 @@ class Planning(models.Model):
         null=True,
         on_delete=models.DO_NOTHING
     )
+
+    def __str__(self):
+        try:
+            return 'Планирование по ст %s на %s год' % (self.FinanceCosts, self.year)
+        except:
+            return 'Ошибка в данных'
+
+
 
 
