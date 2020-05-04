@@ -5,9 +5,25 @@
     <title>Title</title>
 </head>
 <body>
-{% for cost in fin_costs %}
-    {{ cost.title }}
-    <br>
-{% endfor %}
+<table>
+    <tr>
+        <th>Статья финансирования</th>
+        <th>1 квартал</th>
+        <th>2 квартал</th>
+        <th>3 квартал</th>
+        <th>4 квартал</th>
+        <th>Итого</th>
+    </tr>
+    {% for cost in fin_costs %}
+        <tr>
+            <td>{{ cost.title }}</td>
+            <td>xxx</td>
+            <td>xxx</td>
+            <td>xxx</td>
+            <td>xxx</td>
+            <td>xxx</td>
+        </tr>
+    {% endfor %}
+</table>
 </body>
 </html>
