@@ -392,6 +392,7 @@ class SumsBYN(models.Model):
 class Planning(models.Model):
     class QuartChoices:
         ch = [(1, 'I'), (2, 'II'), (2, 'III'), (4, 'IV')]
+
     class Meta:
         verbose_name = "План"
         verbose_name_plural = "Планы"
@@ -406,10 +407,10 @@ class Planning(models.Model):
         verbose_name="Куратор",
         on_delete=models.DO_NOTHING
     )
-    year = models.DateField(
+    year = models.DateField( # TODO refactor DateField -> PositiveIntegerField
         verbose_name="Год"
     )
-    period = models.DateField(
+    period = models.DateField( # TODO refactor DateField -> PositiveIntegerField with choiser
         verbose_name="Период"
     )
     total = models.FloatField(
