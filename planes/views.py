@@ -125,38 +125,16 @@ class ContractView(View):
 
 
 class ContractFabric(View):
-    def get(self, request, contract_id=None):
-        if request.GET['from_ajax']:
+    def get(self, request, contract_id=None, from_ajax=None):
+        if request.GET.__contains__('from_ajax'):
             contract_list = request.GET.getlist('choosed[]')
             print(contract_list)
             return HttpResponse('this is chooser')
 
+        instance_contract, \
+        instance_sum_byn, \
+        instance_sum_rur = self.instances(contract_id)
 
-        if not contract_id:
-            instance_contract = None
-            instance_sum_byn = None
-            instance_sum_rur = None
-        else:
-            instance_contract = get_object_or_404(Contract, id=contract_id)
-            instance_sum_byn = get_object_or_404(SumsBYN, contract__id=contract_id)
-            instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
-
-        if request.method == 'POST':
-            contract_form = ContractForm(request.POST, instance=instance_contract)
-            sum_byn_form = SumsBYNForm(request.POST, instance=instance_sum_byn)
-            sum_rur_form = SumsRURForm(request.POST, instance=instance_sum_rur)
-            if \
-                    contract_form.is_valid() \
-                            and sum_byn_form.is_valid() \
-                            and sum_rur_form.is_valid():
-                new_contract = contract_form.save()
-                contract_sum_b = sum_byn_form.save(commit=False)
-                contract_sum_b.contract = new_contract
-                contract_sum_b.save()
-                contract_sum_r = sum_rur_form.save(commit=False)
-                contract_sum_r.contract = new_contract
-                contract_sum_r.save()
-                return HttpResponse('saved')
 
         contract_form = ContractForm(instance=instance_contract)
         sum_byn_form = SumsBYNForm(instance=instance_sum_byn)
@@ -216,6 +194,7 @@ class ContractFabric(View):
             instance_contract = get_object_or_404(Contract, id=contract_id)
             instance_sum_byn = get_object_or_404(SumsBYN, contract__id=contract_id)
             instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
+        return instance_contract, instance_sum_byn, instance_sum_rur
 
 
 
