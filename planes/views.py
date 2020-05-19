@@ -129,9 +129,10 @@ class ContractFabric(View):
 
     def get(self, request, contract_id=None, from_ajax=None):
         if request.GET.__contains__('from_ajax'):
-            contract_list = request.GET.getlist('choosed[]')
-            print(contract_list)
-            return HttpResponse('this is chooser')
+            contract_id_list = request.GET.getlist('choosed[]')
+            for con_id in contract_id_list:
+                print(Contract.objects.get(id=con_id))
+            return HttpResponse('this is chooser') # TODO here will be function to delete and copy any contract
 
         instance_contract, \
         instance_sum_byn, \
