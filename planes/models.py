@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
+from djmoney.models.fields import MoneyField
 
 
 class Curator(models.Model):
@@ -242,18 +243,21 @@ class Counterpart(models.Model):
         max_length=100,
         verbose_name="Контрагент"
     )
-    email = models.EmailField()
+    email = models.EmailField(blank=True)
     reg_addr = models.CharField(
         max_length=255,
-        verbose_name="Юридический адрес"
+        verbose_name="Юридический адрес",
+        blank=True
     )
     UNP = models.CharField(
         max_length=100,
-        verbose_name="УНП"
+        verbose_name="УНП",
+        blank=True
     )
     phone = models.CharField(
         max_length=100,
-        verbose_name="Номер телефона"
+        verbose_name="Номер телефона",
+        blank=True
     )
 
     def __str__(self):
@@ -408,12 +412,12 @@ class Contract(models.Model):
         return reverse('planes:change_contract', kwargs={'contract_id':self.id})
 
 
-class SumsRUR(models.Model):
+class SumsRUR(models.Model): # TODO is that only in RUR or in eny foregin currency?
     class Meta:
         verbose_name = 'Показатели договора в иностранной валюте'
         verbose_name_plural = 'Показатели договора в иностранной валюте'
 
-    YEARS = [
+    YEARS = [ # TODO make YEARS as FK to YEARS model?
         ("2018", "2018"),
         ("2019", "2019"),
         ("2020", "2020"),
@@ -434,40 +438,44 @@ class SumsRUR(models.Model):
         choices=YEARS,
         max_length=4
     )
-    start_max_price_ASEZ_NDS = models.DecimalField(
+    start_max_price_ASEZ_NDS = MoneyField(
         verbose_name="стартовая цена АСЭЗ с НДС ",
         null=True,
         blank=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency=('RUR', 'RUB')
     )
-    currency_rate_on_load_date_ASEZ_NDS = models.DecimalField(
+    currency_rate_on_load_date_ASEZ_NDS = MoneyField(
         verbose_name="Курс валюты на дату загрузки в бел.руб.",
         null=True,
         blank=True,
         decimal_places=5,
-        max_digits=12
+        max_digits=12,
+        default_currency=('RUR', 'RUB')
     )
-    contract_sum_NDS_RUB = models.DecimalField(
+    contract_sum_NDS_RUB = MoneyField(
         verbose_name="Сумма договора с НДС рос.руб.",
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency=('RUR', 'RUB')
     )
-    currency = models.ForeignKey(
+    currency = models.ForeignKey( # TODO what to do with this
         Currency,
         verbose_name="Валюта",
         on_delete=models.DO_NOTHING,
         blank=True,
         null=True
     )
-    delta_data_ASEZ = models.DecimalField(
+    delta_data_ASEZ = MoneyField(
         verbose_name="Отклонение от НМЦ в АСЭЗ",
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency=('RUR', 'RUB')
     )
 
     def __str__(self):
@@ -541,74 +549,84 @@ class SumsBYN(models.Model):
         verbose_name="Период",
         max_length=15
     )
-    plan_sum_SAP = models.DecimalField(
+    plan_sum_SAP = MoneyField(
         verbose_name="Плановая сумма САП",
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    contract_sum_without_NDS_BYN = models.DecimalField(
+    contract_sum_without_NDS_BYN = MoneyField(
         verbose_name="Сумма всего договора без НДС",
         default=0,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    contract_sum_with_NDS_BYN = models.DecimalField(
+    contract_sum_with_NDS_BYN = MoneyField(
         verbose_name="Сумма договора с НДС бел.руб.",
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    contract_total_sum_with_sub_BYN = models.DecimalField(
+    contract_total_sum_with_sub_BYN = MoneyField(
         verbose_name='Общая сумма договора всего с доп соглашениями, б.р. без ндс',
         null=True,
         blank=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    forecast_total = models.DecimalField(
+    forecast_total = MoneyField(
         verbose_name='Прогноз, всего',
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    economy_total = models.DecimalField(
+    economy_total = MoneyField(
         verbose_name='Экономия по заключенному договору, всего',
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    fact_total = models.DecimalField(
+    fact_total = MoneyField(
         verbose_name='Факт, всего',
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    economy_contract_result = models.DecimalField(
+    economy_contract_result = MoneyField(
         verbose_name='Экономия по результатам исполнения договоров всего',
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    total_sum_unsigned_contracts = models.DecimalField(
+    total_sum_unsigned_contracts = MoneyField(
         verbose_name='Сумма средств по незаключенным договорам',
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
-    economy_total_absolute = models.DecimalField(
+    economy_total_absolute = MoneyField(
         verbose_name='Абсолютная экономия по договору, всего',
         blank=True,
         null=True,
         decimal_places=2,
-        max_digits=12
+        max_digits=12,
+        default_currency='BYN'
     )
 
     def __str__(self):

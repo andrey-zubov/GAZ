@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Title</title>
 </head>
 <body>
@@ -102,7 +103,7 @@
 
     {% for con_sum in contract_and_sum %}
         <tr>
-            <td><a href="{{ con_sum.contract.get_absolute_url }}" id="{{ con_sum.contract.id }}">{{ con_sum.contract.title }}</a></td>
+            <td><input type="checkbox" value="{{ con_sum.contract.id }}" class="contract_choice"><a href="{{ con_sum.contract.get_absolute_url }}" id="{{ con_sum.contract.id }}">{{ con_sum.contract.title }}</a></td>
             <td>{{ con_sum.contract.finance_cost }}</td>
             <td>{{ con_sum.contract.activity_form }}</td>
             <td>{{ con_sum.contract.curator }}</td>
@@ -196,7 +197,35 @@
         </tr>
     {% endfor %}
 </table>
-
 <a href="{% url 'planes:create_contract' %}">Создать договор</a>
+<br>
+<button class="kek">КЛИК МЕ</button>
 </body>
+<script>
+    $('document').ready(function () {
+        $('.contract_choice').on('click', function (chose) {
+            console.log(this.value)
+        });
+
+
+        $('.kek').on('click', function () {
+            let checked = []
+            $('input:checkbox:checked').each(function() {
+                checked.push($(this).val());
+
+            });
+            console.log(checked)
+            $.ajax({
+                'url':'/plane/contracts/create_contract/',
+                'data': {'contract_id':'con_id',
+                        'from_ajax':'checked',
+                        'choosed':(checked),
+                        },
+                success: function (suc) {
+                    console.log('success')
+                }
+            });
+        });
+    });
+</script>
 </html>
