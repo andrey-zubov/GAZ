@@ -138,7 +138,7 @@ class ContractFabric(View):
         instance_sum_rur = self.instances(contract_id)
 
 
-        contract_form, sum_byn_form, sum_rur_form = self.inst_formes(instance_contract,
+        contract_form, sum_byn_form, sum_rur_form = self.inst_forms(instance_contract,
                                                                      instance_sum_byn,
                                                                      instance_sum_rur)
         return render(request,
@@ -154,7 +154,7 @@ class ContractFabric(View):
         instance_sum_byn, \
         instance_sum_rur = self.instances(contract_id)
 
-        contract_form, sum_byn_form, sum_rur_form = self.inst_formes(instance_contract,
+        contract_form, sum_byn_form, sum_rur_form = self.inst_forms(instance_contract,
                                                                      instance_sum_byn,
                                                                      instance_sum_rur)
 
@@ -194,7 +194,7 @@ class ContractFabric(View):
             instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
         return instance_contract, instance_sum_byn, instance_sum_rur
 
-    def inst_formes(self,
+    def inst_forms(self,
                     instance_contract,
                     instance_sum_byn,
                     instance_sum_rur):
