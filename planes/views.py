@@ -125,6 +125,8 @@ class ContractView(View):
 
 
 class ContractFabric(View):
+    create_or_add = 'contracts/add_new_contract.html'
+
     def get(self, request, contract_id=None, from_ajax=None):
         if request.GET.__contains__('from_ajax'):
             contract_list = request.GET.getlist('choosed[]')
@@ -136,11 +138,11 @@ class ContractFabric(View):
         instance_sum_rur = self.instances(contract_id)
 
 
-        contract_form = ContractForm(instance=instance_contract)
-        sum_byn_form = SumsBYNForm(instance=instance_sum_byn)
-        sum_rur_form = SumsRURForm(instance=instance_sum_rur)
+        contract_form, sum_byn_form, sum_rur_form = self.inst_formes(instance_contract,
+                                                                     instance_sum_byn,
+                                                                     instance_sum_rur)
         return render(request,
-                      template_name='contracts/add_new_contract.html',
+                      template_name=self.create_or_add,
                       context={
                           'contract_form': contract_form,
                           'sum_byn_form': sum_byn_form,
@@ -148,14 +150,13 @@ class ContractFabric(View):
                       })
 
     def post(self, request, contract_id=None):
-        if not contract_id:
-            instance_contract = None
-            instance_sum_byn = None
-            instance_sum_rur = None
-        else:
-            instance_contract = get_object_or_404(Contract, id=contract_id)
-            instance_sum_byn = get_object_or_404(SumsBYN, contract__id=contract_id)
-            instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
+        instance_contract, \
+        instance_sum_byn, \
+        instance_sum_rur = self.instances(contract_id)
+
+        contract_form, sum_byn_form, sum_rur_form = self.inst_formes(instance_contract,
+                                                                     instance_sum_byn,
+                                                                     instance_sum_rur)
 
         if request.method == 'POST':
             contract_form = ContractForm(request.POST, instance=instance_contract)
@@ -174,11 +175,8 @@ class ContractFabric(View):
                 contract_sum_r.save()
                 return HttpResponse('saved')
 
-        contract_form = ContractForm(instance=instance_contract)
-        sum_byn_form = SumsBYNForm(instance=instance_sum_byn)
-        sum_rur_form = SumsRURForm(instance=instance_sum_rur)
         return render(request,
-                      template_name='contracts/add_new_contract.html',
+                      template_name=self.create_or_add,
                       context={
                           'contract_form': contract_form,
                           'sum_byn_form': sum_byn_form,
@@ -196,6 +194,14 @@ class ContractFabric(View):
             instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
         return instance_contract, instance_sum_byn, instance_sum_rur
 
+    def inst_formes(self,
+                    instance_contract,
+                    instance_sum_byn,
+                    instance_sum_rur):
+        contract_form = ContractForm(instance=instance_contract)
+        sum_byn_form = SumsBYNForm(instance=instance_sum_byn)
+        sum_rur_form = SumsRURForm(instance=instance_sum_rur)
+        return contract_form, sum_byn_form, sum_rur_form
 
 
 def adding_click_to_UserActivityJournal(request):
