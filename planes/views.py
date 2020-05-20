@@ -128,16 +128,22 @@ class ContractFabric(View):
     create_or_add = 'contracts/add_new_contract.html'
 
     def get(self, request, contract_id=None, from_ajax=None):
+        ''' ajax methods'''
         if request.GET.__contains__('from_ajax'):
-            contract_id_list = request.GET.getlist('choosed[]')
-            for con_id in contract_id_list:
-                print(Contract.objects.get(id=con_id))
-            return HttpResponse('this is chooser') # TODO here will be function to delete and copy any contract
+            if request.GET['from_ajax'] == 'del_contract':
+                contract_id_list = request.GET.getlist('choosed[]')
+                for con_id in contract_id_list:
+                    print(Contract.objects.get(id=con_id))
+                return HttpResponse('this is delete contract') # TODO here will be function to delete acontract
+
+
+        if request.GET.__contains__('pattern_contract_id'): # TODO THIS IS COPY CONTRACT
+            contract_id = int(request.GET['pattern_contract_id'])
+
 
         instance_contract, \
         instance_sum_byn, \
         instance_sum_rur = self.instances(contract_id)
-
 
         contract_form, sum_byn_form, sum_rur_form = self.inst_forms(instance_contract,
                                                                      instance_sum_byn,
@@ -151,6 +157,7 @@ class ContractFabric(View):
                       })
 
     def post(self, request, contract_id=None):
+
         instance_contract, \
         instance_sum_byn, \
         instance_sum_rur = self.instances(contract_id)
@@ -159,22 +166,22 @@ class ContractFabric(View):
                                                                      instance_sum_byn,
                                                                      instance_sum_rur)
 
-        if request.method == 'POST':
-            contract_form = ContractForm(request.POST, instance=instance_contract)
-            sum_byn_form = SumsBYNForm(request.POST, instance=instance_sum_byn)
-            sum_rur_form = SumsRURForm(request.POST, instance=instance_sum_rur)
-            if \
-                    contract_form.is_valid() \
-                            and sum_byn_form.is_valid() \
-                            and sum_rur_form.is_valid():
-                new_contract = contract_form.save()
-                contract_sum_b = sum_byn_form.save(commit=False)
-                contract_sum_b.contract = new_contract
-                contract_sum_b.save()
-                contract_sum_r = sum_rur_form.save(commit=False)
-                contract_sum_r.contract = new_contract
-                contract_sum_r.save()
-                return HttpResponse('saved')
+        contract_form = ContractForm(request.POST, instance=instance_contract) # TODO push it in def instance()
+        sum_byn_form = SumsBYNForm(request.POST, instance=instance_sum_byn)
+        sum_rur_form = SumsRURForm(request.POST, instance=instance_sum_rur)
+        if \
+                contract_form.is_valid() \
+                        and sum_byn_form.is_valid() \
+                        and sum_rur_form.is_valid():
+            new_contract = contract_form.save()
+            contract_sum_b = sum_byn_form.save(commit=False)
+            contract_sum_b.contract = new_contract
+            contract_sum_b.save()
+            contract_sum_r = sum_rur_form.save(commit=False)
+            contract_sum_r.contract = new_contract
+            contract_sum_r.save()
+            return HttpResponse('saved')
+
 
         return render(request,
                       template_name=self.create_or_add,
@@ -329,11 +336,3 @@ def add(request, finance_cost_id):
             plane_form.save()
             return redirect(f'/plane/{str(finance_cost_id)}/curators' )
     return render(request, './planes/add.html', response)
-
-
-def test(request):
-    print('I WAS HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE')
-    x = request.GET['con_id']
-    print(x)
-
-    return HttpResponse('this sucks')

@@ -199,33 +199,49 @@
 </table>
 <a href="{% url 'planes:create_contract' %}">Создать договор</a>
 <br>
-<button class="kek">КЛИК МЕ</button>
+<button class="delete_contract">Удалить контракты</button>
+<button class="copy_contract">Копировать контракт</button>
 </body>
 <script>
     $('document').ready(function () {
         $('.contract_choice').on('click', function (chose) {
-            console.log(this.value)
+            console.log(this.value);
         });
 
-
-        $('.kek').on('click', function () {
-            let checked = []
+        $('.delete_contract').on('click', function (del_con) {
+            let checked = [];
             $('input:checkbox:checked').each(function() {
                 checked.push($(this).val());
 
             });
-            console.log(checked)
+            console.log(checked);
             $.ajax({
                 'url':'/plane/contracts/create_contract/',
                 'data': {'contract_id':'con_id',
-                        'from_ajax':'checked',
+                        'from_ajax':'del_contract',
                         'choosed':(checked),
                         },
                 success: function (suc) {
-                    console.log('success')
+                    console.log('success');
                 }
             });
         });
+
+        $('.copy_contract').on('click', function (copy_con) {
+            let checked = []
+            $('input:checkbox:checked').each(function() {
+                checked.push($(this).val());
+            });
+            console.log(checked.length)
+            if (checked.length != 1) {
+                alert('Выбрано более одного контракта для копирования');
+            }
+            else {
+                    url_to_go = 'copy_contract/' + '?pattern_contract_id='+checked ;
+                    window.location.href = url_to_go ;
+            };
+        });
+
     });
 </script>
 </html>
