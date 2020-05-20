@@ -105,7 +105,9 @@ class ContractView(View):
     today_year = date.today().year
 
     def get(self, request):
-        contracts = Contract.objects.filter(start_date__contains=self.today_year).order_by('-id')
+        contracts = Contract.objects.filter(
+            start_date__contains=self.today_year,
+            contract_active=True).order_by('-id')
         contract_and_sum = []
         for contract in contracts:
             sum_byn = SumsBYN.objects.get(contract=contract)
@@ -129,12 +131,11 @@ class ContractFabric(View):
 
     def get(self, request, contract_id=None, from_ajax=None):
         ''' ajax methods'''
-        if request.GET.__contains__('from_ajax'):
+        if request.GET.__contains__('from_ajax'): # TODO here will be function to delete acontract
             if request.GET['from_ajax'] == 'del_contract':
                 contract_id_list = request.GET.getlist('choosed[]')
-                for con_id in contract_id_list:
-                    print(Contract.objects.get(id=con_id))
-                return HttpResponse('this is delete contract') # TODO here will be function to delete acontract
+                Contract.objects.filter(id__in=contract_id_list).update(contract_active=False)
+                return HttpResponse('this is delete contract')
 
 
         if request.GET.__contains__('pattern_contract_id'): # TODO THIS IS COPY CONTRACT
