@@ -129,6 +129,19 @@ class ContractView(View):
                                })
 
 
+class DeletedContracts(View):
+    def get(self, reqest):
+        deleted_contracts = Contract.objects.filter(contract_active=False)
+        return render(reqest,
+                      template_name='contracts/deleted_contracts.html',
+                      context={
+                          'contracts':deleted_contracts,
+                      })
+
+    def post(self, request):
+        return HttpResponse('post')
+
+
 class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
@@ -154,7 +167,6 @@ class ContractFabric(View):
                       })
 
     def post(self, request, contract_id=None):
-        ''''''
         contract_form, sum_byn_form, sum_rur_form = self.make_forms(request, contract_id)
 
         if \
