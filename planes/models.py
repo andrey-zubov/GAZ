@@ -746,7 +746,7 @@ class Planning(models.Model):
         default=0,
         null=True
     )
-    period = models.DateField( # TODO DELL IT AWAY
+    period = models.DateField( # TODO why we need it?
         verbose_name="Период"
     )
 
