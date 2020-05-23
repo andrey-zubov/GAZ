@@ -143,9 +143,22 @@ class DeletedContracts(View):
         return HttpResponse('post')
 
 
+from .forms import TestForm # TODO delete this far away
 def test(request):
-    form = SumsBYNForm
-    return render(request, template_name='contracts/test.html', context={'form':form})
+    form = TestForm
+
+    contract = Contract.objects.get(id=2)
+    contract_sums_byn = SumsBYN.objects.filter(contract__id=contract.id)
+
+    mega_form = []
+    for sum_byn in contract_sums_byn:
+        mega_form.append(
+            {'form':form(instance=sum_byn)}
+        )
+
+    return render(request, template_name='contracts/test.html', context={'form':form,
+                                                                         'contract_sums_byn':contract_sums_byn,
+                                                                         'mega_form':mega_form})
 
 
 class ContractFabric(View):

@@ -10,7 +10,18 @@
     {% for field in form %}
         {{ field.label }} {{ field }}<br>
     {% endfor %}
-
 </form>
+<hr><hr>
+{% for sum in contract_sums_byn %}
+    {{ sum }}<br>
+{% endfor %}
+<hr>
+<hr>
+{% for wat in mega_form %}
+    {% for field in wat.form %}
+        {{ field.label }} = {{ field }}<br>
+    {% endfor %}
+    <br><br>
+{% endfor %}
 </body>
 </html>

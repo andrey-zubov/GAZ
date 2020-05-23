@@ -38,6 +38,11 @@ class SumsRURForm(forms.ModelForm):
         exclude = ['contract']
 
 
+class TestForm(forms.ModelForm):
+    class Meta:
+        model = SumsBYN
+        exclude = ['contract']
+
 
 class PlanningForm(forms.ModelForm):
     delete = forms.BooleanField(label='удалить', required=False)
