@@ -38,9 +38,21 @@ class SumsRURForm(forms.ModelForm):
         exclude = ['contract']
 
 
-class TestForm(forms.ModelForm):
+class TestForm(forms.ModelForm): # TODO placeholder delet it away
     class Meta:
         model = SumsBYN
+        exclude = ['contract',
+                   'year',
+                   'contract_sum_with_NDS_BYN',
+                   'contract_total_sum_with_sub_BYN',
+                   'economy_total',
+                   'economy_contract_result',
+                   'total_sum_unsigned_contracts',
+                   'economy_total_absolute']
+
+class TestRur(forms.ModelForm):
+    class Meta:
+        model = SumsRUR
         exclude = ['contract']
 
 

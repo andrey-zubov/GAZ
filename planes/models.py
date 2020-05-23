@@ -581,7 +581,7 @@ class SumsBYN(models.Model):
         default_currency='BYN'
     )
     forecast_total = MoneyField(
-        verbose_name='Прогноз, всего',
+        verbose_name='Прогноз',
         blank=True,
         null=True,
         decimal_places=2,
@@ -612,7 +612,7 @@ class SumsBYN(models.Model):
         max_digits=12,
         default_currency='BYN'
     )
-    total_sum_unsigned_contracts = MoneyField(
+    total_sum_unsigned_contracts = MoneyField( # TODO WTF IT IS
         verbose_name='Сумма средств по незаключенным договорам',
         blank=True,
         null=True,
