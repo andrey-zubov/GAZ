@@ -143,6 +143,11 @@ class DeletedContracts(View):
         return HttpResponse('post')
 
 
+def test(request):
+    form = SumsBYNForm
+    return render(request, template_name='contracts/test.html', context={'form':form})
+
+
 class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
