@@ -113,12 +113,24 @@ class ContractView(View):
         contract_and_sum = []
 
         for contract in contracts:
-            sum_byn = SumsBYN.objects.get(contract=contract)
+            sums_byn = SumsBYN.objects.filter(contract=contract)
             sum_rur = SumsRUR.objects.get(contract=contract)
+
+            period_byn = {}
+            for sum in sums_byn:
+                sum_dic = {'plan_sum_SAP':sum.plan_sum_SAP,
+                           'contract_sum_without_NDS_BYN':sum.contract_sum_without_NDS_BYN,
+                           'forecast_total':sum.forecast_total,
+                           'economy_total':sum.economy_total,
+                           'fact_total':sum.fact_total,
+                           'economy_contract_result':sum.economy_contract_result}
+
+                period_byn[sum.period] = sum_dic
+
             contract_and_sum.append(
                 {
                     'contract':contract,
-                    'sum_byn':sum_byn,
+                    'sum_byn':period_byn,
                     'sum_rur':sum_rur,
                 }
             )
@@ -147,7 +159,7 @@ from .forms import TestForm # TODO delete this far away
 def test(request):
     form = TestForm
 
-    contract = Contract.objects.get(id=2)
+    contract = Contract.objects.latest('id')
     contract_sums_byn = SumsBYN.objects.filter(contract__id=contract.id)
 
     mega_form = []
