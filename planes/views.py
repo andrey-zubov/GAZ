@@ -155,22 +155,32 @@ class DeletedContracts(View):
         return HttpResponse('post')
 
 
-from .forms import TestForm # TODO delete this far away
+from django.forms import formset_factory
 def test(request):
-    form = TestForm
+    SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)
+    if request.method == "POST":
+        formset = SumBYNFormSet(request.POST)
+        if formset.is_valid():
+            print(formset.cleaned_data)
+            contract = Contract.objects.latest('id') # TODO PLACEHOLDER
+            for form in formset:
+                new_sum_byn = form.save(commit=False)
+                new_sum_byn.contract = contract
+                new_sum_byn.save()
+            return HttpResponse('poset')
+        else:
+            print(formset.errors)
+            return HttpResponse('Невалидненько')
 
-    contract = Contract.objects.latest('id')
-    contract_sums_byn = SumsBYN.objects.filter(contract__id=contract.id)
 
-    mega_form = []
-    for sum_byn in contract_sums_byn:
-        mega_form.append(
-            {'form':form(instance=sum_byn)}
-        )
 
-    return render(request, template_name='contracts/test.html', context={'form':form,
-                                                                         'contract_sums_byn':contract_sums_byn,
-                                                                         'mega_form':mega_form})
+    formset = SumBYNFormSet(initial=[
+        {'period':'1quart'},
+        {'period':'2quart'},
+        {'period':'3quart'},
+        {'period':'4quart'},
+    ])
+    return render(request, template_name='contracts/test.html', context={'formset':formset})
 
 
 class ContractFabric(View):
@@ -187,27 +197,30 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
-        contract_form, sum_byn_form, sum_rur_form = self.make_forms(request, contract_id)
+        contract_form, sum_byn_forms, sum_rur_form = self.make_forms(request, contract_id)
 
         return render(request,
                       template_name=self.create_or_add,
                       context={
                           'contract_form': contract_form,
-                          'sum_byn_form': sum_byn_form,
+                          'sum_byn_form': sum_byn_forms,
                           'sum_rur_form': sum_rur_form,
                       })
 
     def post(self, request, contract_id=None):
-        contract_form, sum_byn_form, sum_rur_form = self.make_forms(request, contract_id)
+        contract_form, sum_byn_forms, sum_rur_form = self.make_forms(request, contract_id)
 
-        if \
-                contract_form.is_valid() \
-                        and sum_byn_form.is_valid() \
-                        and sum_rur_form.is_valid():
+        if contract_form.is_valid() and sum_rur_form.is_valid():
+            for byn_form in sum_byn_forms:
+                if not byn_form.is_valid():
+                    return HttpResponse('форма не валидна')
+        else:
+
             new_contract = contract_form.save()
-            contract_sum_b = sum_byn_form.save(commit=False)
-            contract_sum_b.contract = new_contract
-            contract_sum_b.save()
+            for byn_form in sum_byn_forms:
+                contract_sum_b = byn_form.save(commit=False)
+                contract_sum_b.contract = new_contract
+                contract_sum_b.save()
             contract_sum_r = sum_rur_form.save(commit=False)
             contract_sum_r.contract = new_contract
             contract_sum_r.save()
@@ -217,7 +230,7 @@ class ContractFabric(View):
                       template_name=self.create_or_add,
                       context={
                           'contract_form': contract_form,
-                          'sum_byn_form': sum_byn_form,
+                          'sum_byn_form': sum_byn_forms,
                           'sum_rur_form': sum_rur_form,
                       })
 
@@ -231,19 +244,33 @@ class ContractFabric(View):
             instance_sum_rur = None
         else:
             instance_contract = get_object_or_404(Contract, id=contract_id)
-            instance_sum_byn = get_object_or_404(SumsBYN, contract__id=contract_id)
             instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
+
+            qs_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
+            # instance_sum_byn = get_object_or_404(SumsBYN, contract__id=contract_id)
 
         if request.method == 'POST':
             contract_form = ContractForm(request.POST, instance=instance_contract)
-            sum_byn_form = SumsBYNForm(request.POST, instance=instance_sum_byn)
             sum_rur_form = SumsRURForm(request.POST, instance=instance_sum_rur)
+
+            sum_byn_forms = []
+            for byn in qs_sum_byn:
+                byn_form = SumsRURForm(request.POST, instance=byn)
+                sum_byn_forms.append(byn_form)
+            # sum_byn_form = SumsBYNForm(request.POST, instance=instance_sum_byn)
+
         else:
             contract_form = ContractForm(None, instance=instance_contract)
-            sum_byn_form = SumsBYNForm(None, instance=instance_sum_byn)
             sum_rur_form = SumsRURForm(None, instance=instance_sum_rur)
 
-        return contract_form, sum_byn_form, sum_rur_form
+            sum_byn_forms = []
+            for byn in qs_sum_byn:
+                byn_form = SumsRURForm(None, instance=byn)
+                sum_byn_forms.append(byn_form)
+            # sum_byn_form = SumsBYNForm(None, instance=instance_sum_byn)
+
+
+        return contract_form, sum_byn_forms, sum_rur_form
 
 
 def adding_click_to_UserActivityJournal(request):

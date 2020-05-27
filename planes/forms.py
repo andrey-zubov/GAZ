@@ -26,10 +26,10 @@ class ContractForm(forms.ModelForm):
         exclude = []
 
 
-class SumsBYNForm(forms.ModelForm):
-    class Meta:
-        model = SumsBYN
-        exclude = ['contract']
+# class SumsBYNForm(forms.ModelForm):
+#     class Meta:
+#         model = SumsBYN
+#         exclude = ['contract']
 
 
 class SumsRURForm(forms.ModelForm):
@@ -38,22 +38,18 @@ class SumsRURForm(forms.ModelForm):
         exclude = ['contract']
 
 
-class TestForm(forms.ModelForm): # TODO placeholder delet it away
+class SumsBYNForm(forms.ModelForm): # TODO placeholder delet it away
     class Meta:
         model = SumsBYN
-        exclude = ['contract',
-                   'year',
-                   'contract_sum_with_NDS_BYN',
-                   'contract_total_sum_with_sub_BYN',
-                   'economy_total',
-                   'economy_contract_result',
-                   'total_sum_unsigned_contracts',
-                   'economy_total_absolute']
+        fields = [
+            'period',
+            'plan_sum_SAP',
+            'contract_sum_without_NDS_BYN',
+            'forecast_total',
+            'fact_total']
 
-class TestRur(forms.ModelForm):
-    class Meta:
-        model = SumsRUR
-        exclude = ['contract']
+# from django.forms import formset_factory
+# SumsBYNFormSet = formset_factory(SumsBYNForm)
 
 
 class PlanningForm(forms.ModelForm):

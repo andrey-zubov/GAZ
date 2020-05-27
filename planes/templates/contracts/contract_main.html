@@ -203,16 +203,6 @@
 <button class="copy_contract">Копировать контракт</button>
 <a href="{% url 'planes:deleted_contracts' %}">Уаленные контракты</a>
 </body>
-<br>
-тест
-<br>
-{% for i in contract_and_sum %}
-    {{i.sum_byn.1quart}}<br><br>
-
-{% endfor %}
-
-
-<br>
 <script>
     $('document').ready(function () {
         $('.contract_choice').on('click', function (chose) {
