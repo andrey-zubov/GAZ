@@ -174,9 +174,9 @@ def test(request):
             print(formset.errors)
             return HttpResponse('Невалидненько')
 
-    formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract=contract   ))
+    formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract=contract)) # для вызова из бд
 
-    # formset = SumBYNFormSet(initial=[
+    # formset = SumBYNFormSet(initial=[ # для создание нового договора
     #     {'period':'1quart'},
     #     {'period':'2quart'},
     #     {'period':'3quart'},
