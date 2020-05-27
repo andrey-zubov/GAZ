@@ -8,17 +8,13 @@
 Добавление нового контракта<br>
 <form action="" method="post">
     {% csrf_token %}
-    {% for field in contract_form %}
-        {{ field.label }}:{{ field }}<br>
-    {% endfor %}
-    <br>ФОРМА 2<br>
-    {% for field in sum_byn_form %}
-        {{ field.label }}:{{ field }}<br>
-    {% endfor %}
-    <br>ФОРМА 3<br>
-    {% for field in sum_rur_form %}
-            {{ field.label }}:{{ field }}<br>
-    {% endfor %}
+        {{ formset.management_form }}
+    <table>
+        {% for form in formset %}
+        {{ form }}
+        {% endfor %}
+    </table>
+
     <button type="submit">ОК</button>
 </form>
 

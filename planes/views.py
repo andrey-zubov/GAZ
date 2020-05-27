@@ -156,14 +156,15 @@ class DeletedContracts(View):
 
 
 from django.forms import formset_factory, modelformset_factory
-def test(request):
-    # SumBYNFormSet = formset_factory(SumsBYNForm, extra=0) # создает НОВЫЕ
-    contract = Contract.objects.latest('id') # TODO
-    SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0) # Берет ИЗ БД
+def test(request, contract_id=None):
+    SumBYNFormSet = formset_factory(SumsBYNForm, extra=0) # создает НОВЫЕ
+    contract = Contract.objects.latest('id') # TODO PLACEHOLDER
+    # SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0) # Берет ИЗ БД
+
+    # def post
     if request.method == "POST":
         formset = SumBYNFormSet(request.POST)
         if formset.is_valid():
-            print(formset.cleaned_data)
             contract = Contract.objects.latest('id') # TODO PLACEHOLDER
             for form in formset:
                 new_sum_byn = form.save(commit=False)
@@ -174,14 +175,14 @@ def test(request):
             print(formset.errors)
             return HttpResponse('Невалидненько')
 
-    formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract=contract)) # для вызова из бд
+    # formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract=contract)) # для вызова из бд
 
-    # formset = SumBYNFormSet(initial=[ # для создание нового договора
-    #     {'period':'1quart'},
-    #     {'period':'2quart'},
-    #     {'period':'3quart'},
-    #     {'period':'4quart'},
-    # ])
+    formset = SumBYNFormSet(initial=[ # для создание нового договора
+        {'period':'1quart'},
+        {'period':'2quart'},
+        {'period':'3quart'},
+        {'period':'4quart'},
+    ])
     return render(request, template_name='contracts/test.html', context={'formset':formset})
 
 
@@ -190,6 +191,7 @@ class ContractFabric(View):
     create_or_add = 'contracts/add_new_contract.html'
 
     def get(self, request, contract_id=None):
+
         if request.GET.__contains__('from_ajax'):
             if request.GET['from_ajax'] == 'del_contract':
                 contract_id_list = request.GET.getlist('choosed[]')
@@ -199,34 +201,68 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
-        contract_form, sum_byn_forms, sum_rur_form = self.make_forms(request, contract_id)
+        if not contract_id:
+            SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
+            formset = SumBYNFormSet(initial=[  # для создание нового договора
+                {'period': '1quart'},
+                {'period': '2quart'},
+                {'period': '3quart'},
+                {'period': '4quart'},
+            ])
+        else:
+            SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
+            formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
 
         return render(request,
                       template_name=self.create_or_add,
                       context={
-                          'contract_form': contract_form,
-                          'sum_byn_form': sum_byn_forms,
-                          'sum_rur_form': sum_rur_form,
+                          'formset': formset,
                       })
 
     def post(self, request, contract_id=None):
-        contract_form, sum_byn_forms, sum_rur_form = self.make_forms(request, contract_id)
-
-        if contract_form.is_valid() and sum_rur_form.is_valid():
-            for byn_form in sum_byn_forms:
-                if not byn_form.is_valid():
-                    return HttpResponse('форма не валидна')
+        if not contract_id:
+            SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
+            formset = SumBYNFormSet(initial=[  # для создание нового договора
+                {'period': '1quart'},
+                {'period': '2quart'},
+                {'period': '3quart'},
+                {'period': '4quart'},
+            ])
         else:
+            SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
+            formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
 
-            new_contract = contract_form.save()
-            for byn_form in sum_byn_forms:
-                contract_sum_b = byn_form.save(commit=False)
-                contract_sum_b.contract = new_contract
-                contract_sum_b.save()
-            contract_sum_r = sum_rur_form.save(commit=False)
-            contract_sum_r.contract = new_contract
-            contract_sum_r.save()
-            return HttpResponse('saved')
+
+        formset = SumBYNFormSet(request.POST)
+        if formset.is_valid():
+            contract = Contract.objects.latest('id')  # TODO PLACEHOLDER
+            for form in formset:
+                new_sum_byn = form.save(commit=False)
+                new_sum_byn.contract = contract
+                new_sum_byn.save()
+            return HttpResponse('poset')
+        else:
+            print(formset.errors)
+            return HttpResponse('Невалидненько')
+
+
+        # contract_form, sum_byn_forms, sum_rur_form = self.make_forms(request, contract_id)
+        #
+        # if contract_form.is_valid() and sum_rur_form.is_valid():
+        #     for byn_form in sum_byn_forms:
+        #         if not byn_form.is_valid():
+        #             return HttpResponse('форма не валидна')
+        # else:
+        #
+        #     new_contract = contract_form.save()
+        #     for byn_form in sum_byn_forms:
+        #         contract_sum_b = byn_form.save(commit=False)
+        #         contract_sum_b.contract = new_contract
+        #         contract_sum_b.save()
+        #     contract_sum_r = sum_rur_form.save(commit=False)
+        #     contract_sum_r.contract = new_contract
+        #     contract_sum_r.save()
+        #     return HttpResponse('saved')
 
         return render(request,
                       template_name=self.create_or_add,
