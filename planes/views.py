@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from .forms import (
@@ -26,8 +26,7 @@ from .models import (
     FinanceCosts, 
     Planning,
 )
-from django.shortcuts import get_object_or_404
-from django.forms import model_to_dict
+from django.urls import reverse
 import json
 
 
@@ -218,10 +217,6 @@ class ContractFabric(View):
 
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
-
-        # if request.path == '/plane/contracts/create_contract/':
-        #     return HttpResponse('eqwrwqerwq')
-
         if not contract_id:
             ''' Create new contract with initial sumBYN and sumRUR'''
             contract_form = ContractForm
@@ -238,9 +233,6 @@ class ContractFabric(View):
             formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
-            if request.path == f'/plane/contracts/change_contract/{contract_id}':
-                pass # изменение договора
-
 
         return render(request,
                       template_name=self.create_or_add,
@@ -279,59 +271,10 @@ class ContractFabric(View):
             new_sum_rur = sum_rur_form.save(commit=False)
             new_sum_rur.contract = new_contract
             new_sum_rur.save()
-
-
-
-            return HttpResponse('poset')
+            return redirect(reverse('planes:contracts'))
         else:
             print(formset.errors)
             return HttpResponse('Невалидненько')
-
-        return render(request,
-                      template_name=self.create_or_add,
-                      context={
-                          'contract_form': contract_form,
-                          'sum_byn_form': sum_byn_forms,
-                          'sum_rur_form': sum_rur_form,
-                      })
-
-    def make_forms(self, request,  contract_id):
-        ''' creates instance objects for forms
-        and
-        return forms based on instance objects '''
-        if not contract_id:
-            instance_contract = None
-            instance_sum_byn = None
-            instance_sum_rur = None
-        else:
-            instance_contract = get_object_or_404(Contract, id=contract_id)
-            instance_sum_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
-
-            qs_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
-            # instance_sum_byn = get_object_or_404(SumsBYN, contract__id=contract_id)
-
-        if request.method == 'POST':
-            contract_form = ContractForm(request.POST, instance=instance_contract)
-            sum_rur_form = SumsRURForm(request.POST, instance=instance_sum_rur)
-
-            sum_byn_forms = []
-            for byn in qs_sum_byn:
-                byn_form = SumsRURForm(request.POST, instance=byn)
-                sum_byn_forms.append(byn_form)
-            # sum_byn_form = SumsBYNForm(request.POST, instance=instance_sum_byn)
-
-        else:
-            contract_form = ContractForm(None, instance=instance_contract)
-            sum_rur_form = SumsRURForm(None, instance=instance_sum_rur)
-
-            sum_byn_forms = []
-            for byn in qs_sum_byn:
-                byn_form = SumsRURForm(None, instance=byn)
-                sum_byn_forms.append(byn_form)
-            # sum_byn_form = SumsBYNForm(None, instance=instance_sum_byn)
-
-
-        return contract_form, sum_byn_forms, sum_rur_form
 
 
 def adding_click_to_UserActivityJournal(request):
