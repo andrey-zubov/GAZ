@@ -189,9 +189,27 @@ def test(request, contract_id=None):
 class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
+    periods = [
+        "year",
+        "6months",
+        "9months",
+        "10months",
+        "11months",
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+    ]
 
     def get(self, request, contract_id=None):
-
         if request.GET.__contains__('from_ajax'):
             if request.GET['from_ajax'] == 'del_contract':
                 contract_id_list = request.GET.getlist('choosed[]')
@@ -201,7 +219,13 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
+        # if request.path == '/plane/contracts/create_contract/':
+        #     return HttpResponse('eqwrwqerwq')
+
         if not contract_id:
+            ''' Create new contract with initial sumBYN and sumRUR'''
+            contract_form = ContractForm
+            sum_rur_form = SumsRURForm
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
             formset = SumBYNFormSet(initial=[  # для создание нового договора
                 {'period': '1quart'},
@@ -212,57 +236,48 @@ class ContractFabric(View):
         else:
             SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
             formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
+            contract_form = ContractForm
+            sum_rur_form = SumsRURForm
+            if request.path == f'/plane/contracts/change_contract/{contract_id}':
+                pass # изменение договора
+
 
         return render(request,
                       template_name=self.create_or_add,
                       context={
                           'formset': formset,
+                          'contract_form':contract_form,
+                          'rur_form':sum_rur_form,
                       })
 
     def post(self, request, contract_id=None):
         if not contract_id:
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
-            formset = SumBYNFormSet(initial=[  # для создание нового договора
-                {'period': '1quart'},
-                {'period': '2quart'},
-                {'period': '3quart'},
-                {'period': '4quart'},
-            ])
         else:
             SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
-            formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
 
-
+        contract_form = ContractForm(request.POST)
+        sum_rur_form = SumsRURForm(request.POST)
         formset = SumBYNFormSet(request.POST)
-        if formset.is_valid():
-            contract = Contract.objects.latest('id')  # TODO PLACEHOLDER
+        if sum_rur_form.is_valid() and contract_form.is_valid() and formset.is_valid():
+            new_contract = contract_form.save()
             for form in formset:
                 new_sum_byn = form.save(commit=False)
-                new_sum_byn.contract = contract
+                new_sum_byn.contract = new_contract
                 new_sum_byn.save()
+            for p in self.periods:
+                new_sum_byn = SumsBYN.objects.create(period=p, contract=new_contract)
+
+            new_sum_rur = sum_rur_form.save(commit=False)
+            new_sum_rur.contract = new_contract
+            new_sum_rur.save()
+
+
+
             return HttpResponse('poset')
         else:
             print(formset.errors)
             return HttpResponse('Невалидненько')
-
-
-        # contract_form, sum_byn_forms, sum_rur_form = self.make_forms(request, contract_id)
-        #
-        # if contract_form.is_valid() and sum_rur_form.is_valid():
-        #     for byn_form in sum_byn_forms:
-        #         if not byn_form.is_valid():
-        #             return HttpResponse('форма не валидна')
-        # else:
-        #
-        #     new_contract = contract_form.save()
-        #     for byn_form in sum_byn_forms:
-        #         contract_sum_b = byn_form.save(commit=False)
-        #         contract_sum_b.contract = new_contract
-        #         contract_sum_b.save()
-        #     contract_sum_r = sum_rur_form.save(commit=False)
-        #     contract_sum_r.contract = new_contract
-        #     contract_sum_r.save()
-        #     return HttpResponse('saved')
 
         return render(request,
                       template_name=self.create_or_add,
