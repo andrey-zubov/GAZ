@@ -236,8 +236,8 @@ class ContractFabric(View):
         else:
             SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
             formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
-            contract_form = ContractForm
-            sum_rur_form = SumsRURForm
+            contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+            sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
             if request.path == f'/plane/contracts/change_contract/{contract_id}':
                 pass # изменение договора
 
@@ -253,20 +253,28 @@ class ContractFabric(View):
     def post(self, request, contract_id=None):
         if not contract_id:
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
+            instance_contract = None
+            instance_rur = None
+            create_periods_flag = True
         else:
             SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
+            instance_contract = get_object_or_404(Contract, id=contract_id)
+            instance_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
+            create_periods_flag = False
 
-        contract_form = ContractForm(request.POST)
-        sum_rur_form = SumsRURForm(request.POST)
+        contract_form = ContractForm(request.POST, instance=instance_contract)
+        sum_rur_form = SumsRURForm(request.POST, instance=instance_rur)
         formset = SumBYNFormSet(request.POST)
+
         if sum_rur_form.is_valid() and contract_form.is_valid() and formset.is_valid():
             new_contract = contract_form.save()
             for form in formset:
                 new_sum_byn = form.save(commit=False)
                 new_sum_byn.contract = new_contract
                 new_sum_byn.save()
-            for p in self.periods:
-                new_sum_byn = SumsBYN.objects.create(period=p, contract=new_contract)
+            if create_periods_flag:
+                for p in self.periods:
+                    new_sum_byn = SumsBYN.objects.create(period=p, contract=new_contract)
 
             new_sum_rur = sum_rur_form.save(commit=False)
             new_sum_rur.contract = new_contract
