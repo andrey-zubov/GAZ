@@ -7,12 +7,15 @@ from planes.models import (
   SumsRUR)
 
 
-
-
-
 class LoginForm(forms.Form):
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(widget=forms.TextInput(attrs={
+        'class':'sign-in-textfield',
+        'placeholder':"Login",
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'class':'sign-in-textfield',
+        'placeholder':'Password',
+    }))
 
 
 class RegisterForm(forms.Form):
@@ -26,19 +29,13 @@ class ContractForm(forms.ModelForm):
         exclude = []
 
 
-# class SumsBYNForm(forms.ModelForm):
-#     class Meta:
-#         model = SumsBYN
-#         exclude = ['contract']
-
-
 class SumsRURForm(forms.ModelForm):
     class Meta:
         model = SumsRUR
         exclude = ['contract']
 
 
-class SumsBYNForm(forms.ModelForm): # TODO placeholder delet it away
+class SumsBYNForm(forms.ModelForm):
     class Meta:
         model = SumsBYN
         fields = [
@@ -47,9 +44,6 @@ class SumsBYNForm(forms.ModelForm): # TODO placeholder delet it away
             'contract_sum_without_NDS_BYN',
             'forecast_total',
             'fact_total']
-
-# from django.forms import formset_factory
-# SumsBYNFormSet = formset_factory(SumsBYNForm)
 
 
 class PlanningForm(forms.ModelForm):
