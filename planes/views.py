@@ -131,10 +131,11 @@ class ContractView(View):
 
     def test(self, search_name):
         result = []
-        #search_name = search_name.split()
+        # search_name = search_name.split()
         contracts = Contract.objects.filter(contract_active=True).order_by('-id')
-        contracts = contracts.filter(title__icontains=search_name)
+        contracts = contracts.filter(Q(title__icontains=search_name) | Q(title__in=search_name.split()))
 
+        print(search_name)
         print(contracts)
         return contracts
 
