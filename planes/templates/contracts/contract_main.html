@@ -202,6 +202,26 @@
 <button class="delete_contract">Удалить контракты</button>
 <button class="copy_contract">Копировать контракт</button>
 <a href="{% url 'planes:deleted_contracts' %}">Уаленные контракты</a>
+
+<br><br>
+<div class="contract_search_div">
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="search" name="search_name" placeholder="Поиск договора...">
+        <button type="submit">OK</button>
+    </form>
+    <br>
+    <br>
+    GET строка
+    <form action="">
+        <input type="search" name="search_name">
+        <button type="submit">GET</button>
+    </form>
+
+</div>
+
+
+
 </body>
 <script>
     $('document').ready(function () {

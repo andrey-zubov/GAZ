@@ -100,7 +100,7 @@ def register_view(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
-
+from django.db.models import Q
 class ContractView(View):
     ''' render contracts register table and allow to search '''
     template_name = 'contracts/contract_main.html'
@@ -110,6 +110,35 @@ class ContractView(View):
         contracts = Contract.objects.filter(
             start_date__contains=self.today_year,
             contract_active=True).order_by('-id')
+
+        if request.GET.__contains__('search_name'):
+            print(request.GET['search_name'])
+            search_name = request.GET['search_name']
+            contracts = self.test(search_name)
+
+
+
+
+        contract_and_sum = self.renderer(request, contracts)
+
+        return render(request,
+                      template_name=self.template_name,
+                      context={'contracts':contracts,
+                               'contract_and_sum':contract_and_sum,
+                               })
+
+
+
+    def test(self, search_name):
+        result = []
+        #search_name = search_name.split()
+        contracts = Contract.objects.filter(contract_active=True).order_by('-id')
+        contracts = contracts.filter(title__icontains=search_name)
+
+        print(contracts)
+        return contracts
+
+    def renderer(self, request, contracts):
         contract_and_sum = []
 
         for contract in contracts:
@@ -118,28 +147,23 @@ class ContractView(View):
 
             period_byn = {}
             for sum in sums_byn:
-                sum_dic = {'plan_sum_SAP':sum.plan_sum_SAP,
-                           'contract_sum_without_NDS_BYN':sum.contract_sum_without_NDS_BYN,
-                           'forecast_total':sum.forecast_total,
-                           'economy_total':sum.economy_total,
-                           'fact_total':sum.fact_total,
-                           'economy_contract_result':sum.economy_contract_result}
+                sum_dic = {'plan_sum_SAP': sum.plan_sum_SAP,
+                           'contract_sum_without_NDS_BYN': sum.contract_sum_without_NDS_BYN,
+                           'forecast_total': sum.forecast_total,
+                           'economy_total': sum.economy_total,
+                           'fact_total': sum.fact_total,
+                           'economy_contract_result': sum.economy_contract_result}
 
                 period_byn[sum.period] = sum_dic
 
             contract_and_sum.append(
                 {
-                    'contract':contract,
-                    'sum_byn':period_byn,
-                    'sum_rur':sum_rur,
+                    'contract': contract,
+                    'sum_byn': period_byn,
+                    'sum_rur': sum_rur,
                 }
             )
-
-        return render(request,
-                      template_name=self.template_name,
-                      context={'contracts':contracts,
-                               'contract_and_sum':contract_and_sum,
-                               })
+        return contract_and_sum
 
 
 class DeletedContracts(View):
