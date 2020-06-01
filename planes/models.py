@@ -612,7 +612,7 @@ class SumsBYN(models.Model):
         max_digits=12,
         default_currency='BYN'
     )
-    total_sum_unsigned_contracts = MoneyField( # TODO WTF IT IS
+    total_sum_unsigned_contracts = MoneyField( # TODO wat IT IS
         verbose_name='Сумма средств по незаключенным договорам',
         blank=True,
         null=True,
