@@ -107,17 +107,18 @@ class ContractView(View):
     today_year = date.today().year
 
     def get(self, request):
-        contracts = Contract.objects.filter(
-            start_date__contains=self.today_year,
-            contract_active=True).order_by('-id')
-
         if request.GET.__contains__('search_name'):
             print(request.GET['search_name'])
             search_name = request.GET['search_name']
+            search_date1 = request.GET['search_date1']
+            search_date2 = request.GET['search_date2']
+
             contracts = self.test(search_name)
 
-
-
+        else:
+            contracts = Contract.objects.filter(
+                start_date__contains=self.today_year,
+                contract_active=True).order_by('-id')
 
         contract_and_sum = self.renderer(request, contracts)
 
@@ -127,11 +128,7 @@ class ContractView(View):
                                'contract_and_sum':contract_and_sum,
                                })
 
-
-
     def test(self, search_name):
-        result = []
-        # search_name = search_name.split()
         contracts = Contract.objects.filter(contract_active=True).order_by('-id')
         contracts = contracts.filter(Q(title__icontains=search_name) | Q(title__in=search_name.split()))
 
