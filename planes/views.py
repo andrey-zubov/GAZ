@@ -25,10 +25,22 @@ from .models import (
     Curator, 
     FinanceCosts, 
     Planning,
+    ContractType,
+    ContractMode,
+    PurchaseType,
+StateASEZ,
+NumberPZTRU,
+ContractStatus,
+Counterpart
+
+
+
+
 )
 from django.urls import reverse
 import json
 from django.forms import formset_factory, modelformset_factory
+from django.db.models import Q
 
 
 @login_required
@@ -100,43 +112,71 @@ def register_view(request):
     context = {'form': form}
     return render(request, 'registration/register.html', context)
 
-from django.db.models import Q
+
 class ContractView(View):
     ''' render contracts register table and allow to search '''
     template_name = 'contracts/contract_main.html'
     today_year = date.today().year
+    cont = {}
+    cont['all_fin_costs'] = FinanceCosts.objects.all()
+    cont['all_curators'] = Curator.objects.all()
+    cont['all_contract_types'] = ContractType.objects.all()
+    cont['all_contract_modes'] = ContractMode.objects.all()
+    cont['all_purchase_types'] = PurchaseType.objects.all()
+    cont['all_state_asez'] = StateASEZ.objects.all()
+    cont['all_pztru'] = NumberPZTRU.objects.all()
+    cont['all_cont_suatus'] = ContractStatus.objects.all()
+    cont['all_counterparts'] = Counterpart.objects.all()
 
     def get(self, request):
+        context = self.cont.copy()
+
         if request.GET.__contains__('search_name'):
-            print(request.GET['search_name'])
-            search_name = request.GET['search_name']
-            search_date1 = request.GET['search_date1']
-            search_date2 = request.GET['search_date2']
+            print(request.GET)
+            contracts = self.search(request)
 
-            contracts = self.test(search_name)
-
-        else:
+        else:  # if no search request:
             contracts = Contract.objects.filter(
                 start_date__contains=self.today_year,
                 contract_active=True).order_by('-id')
 
-        contract_and_sum = self.renderer(request, contracts)
+        contract_and_sum = self.make_table(contracts)
 
+        context['contracts'] = contracts
+        context['contract_and_sum'] = contract_and_sum
         return render(request,
                       template_name=self.template_name,
-                      context={'contracts':contracts,
-                               'contract_and_sum':contract_and_sum,
-                               })
+                      context=context)
 
-    def test(self, search_name):
+    def search(self, request):
+        if request.GET['search_name'] == '':
+            search_name = None
+        else:
+            search_name = request.GET['search_name']
+        search_date1 = request.GET['search_date1']
+        search_date2 = request.GET['search_date2']
+        search_fin_cost = request.GET['search_fin_cost']
+        # search_curator = request.GET['search_curator']
+        # search_type = request.GET['search_type']
+        # search_mode = request.GET['search_mode']
+        # search_purchase_type = request.GET['search_purchase_type']
+        # search_asez = request.GET['search_asez']
+        # search_pztru = request.GET['search_pztru']
+        # search_cont_suatus = request.GET['search_cont_suatus']
+
         contracts = Contract.objects.filter(contract_active=True).order_by('-id')
-        contracts = contracts.filter(Q(title__icontains=search_name) | Q(title__in=search_name.split()))
 
-        print(search_name)
+
+        contracts = contracts.filter(
+            Q(title__icontains=search_name) |
+            Q(title__in=search_name.split()) |
+            Q(finance_cost=search_fin_cost)
+        )
         print(contracts)
         return contracts
 
-    def renderer(self, request, contracts):
+
+    def make_table(self, contracts):
         contract_and_sum = []
 
         for contract in contracts:
