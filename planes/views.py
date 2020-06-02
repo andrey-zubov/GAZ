@@ -156,23 +156,31 @@ class ContractView(View):
         search_date1 = request.GET['search_date1']
         search_date2 = request.GET['search_date2']
         search_fin_cost = request.GET['search_fin_cost']
-        # search_curator = request.GET['search_curator']
-        # search_type = request.GET['search_type']
-        # search_mode = request.GET['search_mode']
-        # search_purchase_type = request.GET['search_purchase_type']
-        # search_asez = request.GET['search_asez']
-        # search_pztru = request.GET['search_pztru']
-        # search_cont_suatus = request.GET['search_cont_suatus']
-
+        search_curator = request.GET['search_curator']
+        search_type = request.GET['search_type']
+        search_mode = request.GET['search_mode']
+        search_purchase_type = request.GET['search_purchase_type']
+        search_asez = request.GET['search_asez']
+        search_pztru = request.GET['search_pztru']
+        search_cont_suatus = request.GET['search_cont_suatus']
+        search_counterpart = request.GET['search_counterpart']
         contracts = Contract.objects.filter(contract_active=True).order_by('-id')
 
+        if request.GET['search_name'] != '':
+            contracts = contracts.filter(Q(title__icontains=search_name) | Q(title__in=search_name.split()))
+            return contracts
 
         contracts = contracts.filter(
-            Q(title__icontains=search_name) |
-            Q(title__in=search_name.split()) |
-            Q(finance_cost=search_fin_cost)
+            Q(finance_cost=search_fin_cost) |
+            Q(curator=search_curator) |
+            Q(contract_type=search_type) |
+            Q(contract_mode=search_mode) |
+            Q(purchase_type=search_purchase_type) |
+            Q(stateASEZ=search_asez) |
+            Q(number_PZTRU=search_pztru) |
+            Q(contract_status=search_cont_suatus) |
+            Q(counterpart=search_counterpart)
         )
-        print(contracts)
         return contracts
 
 
