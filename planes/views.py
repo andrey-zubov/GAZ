@@ -155,6 +155,7 @@ class ContractView(View):
             search_name = request.GET['search_name']
         search_date1 = request.GET['search_date1']
         search_date2 = request.GET['search_date2']
+        #ordinal_date1, ordinal_date2 = self.time_period(search_date1, search_date2)
         search_fin_cost = request.GET['search_fin_cost']
         search_curator = request.GET['search_curator']
         search_type = request.GET['search_type']
@@ -165,10 +166,15 @@ class ContractView(View):
         search_cont_suatus = request.GET['search_cont_suatus']
         search_counterpart = request.GET['search_counterpart']
         contracts = Contract.objects.filter(contract_active=True).order_by('-id')
+        try:
+            contracts = contracts.filter(start_date__range=(search_date1, search_date2))
+        except:
+            pass
 
         if request.GET['search_name'] != '':
             contracts = contracts.filter(Q(title__icontains=search_name) | Q(title__in=search_name.split()))
             return contracts
+
 
         contracts = contracts.filter(
             Q(finance_cost=search_fin_cost) |
@@ -181,7 +187,17 @@ class ContractView(View):
             Q(contract_status=search_cont_suatus) |
             Q(counterpart=search_counterpart)
         )
+
+
         return contracts
+
+
+    def time_period(self, date1, date2):
+        y1, m1, d1 = [int(i) for i in date1.split('-')]
+        y2, m2, d2 = [int(i) for i in date2.split('-')]
+        ordinal_date1 = date(y1, m1, d1).toordinal()
+        ordinal_date2 = date(y2, m2, d2).toordinal()
+        return ordinal_date1, ordinal_date2
 
 
     def make_table(self, contracts):
