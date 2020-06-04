@@ -29,6 +29,9 @@ class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
         exclude = []
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder':'введите название'})
+        }
 
 
 class SumsRURForm(forms.ModelForm):
