@@ -307,24 +307,26 @@
             console.log(this.value);
         });
 
-        $('.delete_contract').on('click', function (del_con) {
-            let checked = [];
-            $('input:checkbox:checked').each(function() {
-                checked.push($(this).val());
+        {% if 'planes:delete_contract' in perms %}
+            $('.delete_contract').on('click', function (del_con) {
+                let checked = [];
+                $('input:checkbox:checked').each(function() {
+                    checked.push($(this).val());
 
+                });
+                console.log(checked);
+                $.ajax({
+                    'url':'/plane/contracts/copy_contract/',
+                    'data': {'contract_id':'con_id',
+                            'from_ajax':'del_contract',
+                            'choosed':(checked),
+                            },
+                    success: function (suc) {
+                        console.log('success');
+                    }
+                });
             });
-            console.log(checked);
-            $.ajax({
-                'url':'/plane/contracts/copy_contract/',
-                'data': {'contract_id':'con_id',
-                        'from_ajax':'del_contract',
-                        'choosed':(checked),
-                        },
-                success: function (suc) {
-                    console.log('success');
-                }
-            });
-        });
+        {% endif %}
 
         $('.copy_contract').on('click', function (copy_con) {
             let checked = []
