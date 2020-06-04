@@ -10,7 +10,7 @@ from .forms import (
     PlanningForm,
     YearForm,
 )
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -37,6 +37,11 @@ from django.urls import reverse
 import json
 from django.forms import formset_factory, modelformset_factory
 from django.db.models import Q
+
+
+def test(request):
+
+    return render(request, template_name='contracts/test.html', context={})
 
 
 @login_required
