@@ -9,6 +9,7 @@ from .forms import (
     SumsRURForm,
     PlanningForm,
     YearForm,
+SumsBYNForm_user
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -281,12 +282,10 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
+
+
         if not contract_id:
             ''' Create new contract with initial sumBYN and sumRUR'''
-
-            print(request.user.groups)
-
-
             contract_form = ContractForm
             sum_rur_form = SumsRURForm
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
@@ -297,10 +296,21 @@ class ContractFabric(View):
                 {'period': '4quart'},
             ])
         else:
-            SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
-            formset = SumBYNFormSet(queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
-            contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-            sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+            # if request.user.has_perm('planes:change_contract'):
+                #return HttpResponse(request.user.groups.all())
+            if request.user.groups.filter(name='test_group'): # TODO change name
+                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_user, extra=0)  # Берет ИЗ БД
+                formset = SumBYNFormSet(
+                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
+                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+
+            else:
+                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
+                formset = SumBYNFormSet(
+                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
+                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
 
         return render(request,
                       template_name=self.create_or_add,

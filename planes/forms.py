@@ -33,41 +33,6 @@ class ContractForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'placeholder':'введите название'})
         }
 
-class ContractForm_user(forms.ModelForm):
-    class Meta:
-        model = Contract
-        exclude = []
-        widgets = {
-            'title': forms.TextInput(attrs={'placeholder':'ты юзверь'})
-        }
-
-
-class ContractForm_lawyer(forms.ModelForm):
-    class Meta:
-        model = Contract
-        exclude = []
-        widgets = {
-            'title': forms.TextInput(attrs={'placeholder':'ты юристь'})
-        }
-
-
-class ContractForm_spec_ASEZ(forms.ModelForm):
-    class Meta:
-        model = Contract
-        exclude = []
-        widgets = {
-            'title': forms.TextInput(attrs={'placeholder':'ты asez'})
-        }
-
-
-class ContractForm_economist(forms.ModelForm):
-    class Meta:
-        model = Contract
-        exclude = []
-        widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'ты эккономист'})
-        }
-
 
 class SumsRURForm(forms.ModelForm):
     class Meta:
@@ -82,6 +47,17 @@ class SumsBYNForm(forms.ModelForm):
             'period',
             'plan_sum_SAP',
             'contract_sum_without_NDS_BYN',
+            'forecast_total',
+            'fact_total',
+            'economy_total',]
+
+class SumsBYNForm_user(forms.ModelForm):
+    class Meta:
+        model = SumsBYN
+        fields = [
+            'period',
+            # 'plan_sum_SAP',
+            # 'contract_sum_without_NDS_BYN',
             'forecast_total',
             'fact_total',
             'economy_total',]
