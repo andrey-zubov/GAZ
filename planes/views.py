@@ -10,7 +10,8 @@ from .forms import (
     PlanningForm,
     YearForm,
     SumsBYNForm_economist,
-    SumsBYNForm_lawyer
+    SumsBYNForm_lawyer,
+    SumsBYNForm_asez
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -308,6 +309,13 @@ class ContractFabric(View):
 
             elif request.user.groups.filter(name='lawyers'):
                 SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_lawyer, extra=0)  # Берет ИЗ БД
+                formset = SumBYNFormSet(
+                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
+                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+
+            elif request.user.groups.filter(name='asez'):
+                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_asez, extra=0)  # Берет ИЗ БД
                 formset = SumBYNFormSet(
                     queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
                 contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
