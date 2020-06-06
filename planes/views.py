@@ -9,7 +9,7 @@ from .forms import (
     SumsRURForm,
     PlanningForm,
     YearForm,
-SumsBYNForm_user
+    SumsBYNForm_economist,
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -297,9 +297,9 @@ class ContractFabric(View):
             ])
         else:
             # if request.user.has_perm('planes:change_contract'):
-                #return HttpResponse(request.user.groups.all())
-            if request.user.groups.filter(name='test_group'): # TODO change name
-                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_user, extra=0)  # Берет ИЗ БД
+                # return HttpResponse(request.user.groups.all())
+            if request.user.groups.filter(name='economists'):  # TODO change name
+                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_economist, extra=0)  # Берет ИЗ БД
                 formset = SumBYNFormSet(
                     queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
                 contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))

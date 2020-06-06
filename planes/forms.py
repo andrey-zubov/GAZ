@@ -51,16 +51,15 @@ class SumsBYNForm(forms.ModelForm):
             'fact_total',
             'economy_total',]
 
-class SumsBYNForm_user(forms.ModelForm):
+class SumsBYNForm_economist(forms.ModelForm):
     class Meta:
         model = SumsBYN
         fields = [
             'period',
-            # 'plan_sum_SAP',
-            # 'contract_sum_without_NDS_BYN',
+            'plan_sum_SAP',
+            'contract_sum_without_NDS_BYN',
             'forecast_total',
-            'fact_total',
-            'economy_total',]
+            'fact_total',]
 
 
 class PlanningForm(forms.ModelForm):
