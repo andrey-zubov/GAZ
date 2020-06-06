@@ -62,6 +62,12 @@ class SumsBYNForm_economist(forms.ModelForm):
             'fact_total',]
 
 
+class SumsBYNForm_lawyer(forms.ModelForm):
+    class Meta:
+        model = SumsBYN
+        fields = []
+
+
 class PlanningForm(forms.ModelForm):
     # arr = [ item for item in Curator if item.title != "ALL"]
     curator = forms.ModelChoiceField(Curator.objects.exclude(title='ALL'))

@@ -10,6 +10,7 @@ from .forms import (
     PlanningForm,
     YearForm,
     SumsBYNForm_economist,
+    SumsBYNForm_lawyer
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -298,8 +299,15 @@ class ContractFabric(View):
         else:
             # if request.user.has_perm('planes:change_contract'):
                 # return HttpResponse(request.user.groups.all())
-            if request.user.groups.filter(name='economists'):  # TODO change name
+            if request.user.groups.filter(name='economists'):
                 SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_economist, extra=0)  # Берет ИЗ БД
+                formset = SumBYNFormSet(
+                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
+                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+
+            elif request.user.groups.filter(name='lawyers'):
+                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_lawyer, extra=0)  # Берет ИЗ БД
                 formset = SumBYNFormSet(
                     queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
                 contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
@@ -352,7 +360,7 @@ class ContractFabric(View):
             return redirect(reverse('planes:contracts'))
         else:
             print(formset.errors)
-            return HttpResponse('Невалидненько')
+            return HttpResponse(formset.errors)
 
 
 def adding_click_to_UserActivityJournal(request):
