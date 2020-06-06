@@ -23,17 +23,20 @@ urlpatterns = [
     path('contracts/', login_required(ContractView.as_view()), name='contracts'),
     path('contracts/create_contract/',
          login_required(
-             permission_required('planes:add_contract')(ContractFabric.as_view())
+            # permission_required('planes:add_contract')
+             (ContractFabric.as_view())
          ),
          name='create_contract'),
     path('contracts/change_contract/<contract_id>',
          login_required(
-             permission_required('planes.change_contract')(ContractFabric.as_view())
+             # permission_required('planes.change_contract')
+             (ContractFabric.as_view())
          ),
          name='change_contract'),
     path('contracts/copy_contract/',
          login_required(
-            permission_required('planes:add_contract')(ContractFabric.as_view())
+            # permission_required('planes:add_contract')
+            (ContractFabric.as_view())
          ),
          name='copy_contract'),
     path('contracts/deleted_contracts/', DeletedContracts.as_view(), name='deleted_contracts'),

@@ -12,7 +12,7 @@ from .forms import (
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.core.mail import send_mail
 from django.views import View
 from datetime import date
@@ -40,6 +40,12 @@ from django.db.models import Q
 
 
 def test(request):
+    perm = Permission.objects.all()
+    print(request.user.get_user_permissions())
+    if request.user.has_perm('auth.add_group'):
+        return HttpResponse('it can auth.add_group')
+
+
 
     return render(request, template_name='contracts/test.html', context={})
 
@@ -277,6 +283,10 @@ class ContractFabric(View):
 
         if not contract_id:
             ''' Create new contract with initial sumBYN and sumRUR'''
+
+            print(request.user.groups)
+
+
             contract_form = ContractForm
             sum_rur_form = SumsRURForm
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
