@@ -59,13 +59,22 @@ class SumsBYNForm_economist(forms.ModelForm):
             'plan_sum_SAP',
             'contract_sum_without_NDS_BYN',
             'forecast_total',
-            'fact_total',]
-
+            'fact_total',
+            'economy_total',]
 
 class SumsBYNForm_lawyer(forms.ModelForm):
     class Meta:
         model = SumsBYN
-        fields = []
+        fields = [
+            'period',
+            'plan_sum_SAP',
+            'contract_sum_without_NDS_BYN',
+            'forecast_total',
+            'fact_total',
+            'economy_total', ]
+        widgets = {
+            'plan_sum_SAP': forms.TextInput(attrs={'readonly':True}),
+        }
 
 
 class PlanningForm(forms.ModelForm):
