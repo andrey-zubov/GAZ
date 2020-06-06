@@ -61,6 +61,15 @@ class SumsBYNForm_economist(forms.ModelForm):
             'forecast_total',
             'fact_total',
             'economy_total',]
+        widgets = {
+            'period': forms.Select(attrs={'disabled': True}),
+            'plan_sum_SAP': forms.TextInput(attrs={'readonly':False}),
+            'contract_sum_without_NDS_BYN': forms.TextInput(attrs={'readonly':False}),
+            'forecast_total': forms.TextInput(attrs={'readonly': False}),
+            'fact_total': forms.TextInput(attrs={'readonly': False}),
+            'economy_total': forms.TextInput(attrs={'readonly': True}),
+        }
+
 
 class SumsBYNForm_lawyer(forms.ModelForm):
     class Meta:
@@ -73,7 +82,12 @@ class SumsBYNForm_lawyer(forms.ModelForm):
             'fact_total',
             'economy_total', ]
         widgets = {
+            'period': forms.Select(attrs={'disabled': True}),
             'plan_sum_SAP': forms.TextInput(attrs={'readonly':True}),
+            'contract_sum_without_NDS_BYN': forms.TextInput(attrs={'readonly': True}),
+            'forecast_total': forms.TextInput(attrs={'readonly': True}),
+            'fact_total': forms.TextInput(attrs={'readonly': True}),
+            'economy_total': forms.TextInput(attrs={'readonly': True}),
         }
 
 
