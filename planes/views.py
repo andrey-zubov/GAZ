@@ -42,17 +42,6 @@ from django.forms import formset_factory, modelformset_factory
 from django.db.models import Q
 
 
-def test(request):
-    perm = Permission.objects.all()
-    print(request.user.get_user_permissions())
-    if request.user.has_perm('auth.add_group'):
-        return HttpResponse('it can auth.add_group')
-
-
-
-    return render(request, template_name='contracts/test.html', context={})
-
-
 @login_required
 def index(request):
     return render(request, 'planes/index.html')
@@ -347,8 +336,8 @@ class ContractFabric(View):
             choosed_form = SumsBYNForm_economist
         elif user_groups.filter(name='lawyers'):
             choosed_form = SumsBYNForm_lawyer
-        elif user_groups.filter(name='lawyers'):
-            choosed_form = SumsBYNForm_lawyer
+        elif user_groups.filter(name='spec_ASEZ'):
+            choosed_form = SumsBYNForm_asez
         else:
             choosed_form = SumsBYNForm
 
