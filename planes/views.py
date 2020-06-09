@@ -255,11 +255,6 @@ class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
     periods = [
-        # "year",
-        # "6months",
-        # "9months",
-        # "10months",
-        # "11months",
         "jan",
         "feb",
         "mar",
@@ -295,19 +290,12 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
-
-
         if not contract_id:
             ''' Create new contract with initial sumBYN and sumRUR'''
             contract_form = ContractForm
             sum_rur_form = SumsRURForm
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
-            formset = SumBYNFormSet(initial=[  # для создание нового договора
-                # {'period': '1quart'},
-                # {'period': '2quart'},
-                # {'period': '3quart'},
-                # {'period': '4quart'},
-            ])
+            formset = SumBYNFormSet()
         else:
             user_groups = request.user.groups
             formset, contract_form, sum_rur_form = self.choose_formset(user_groups, contract_id)
