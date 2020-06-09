@@ -255,11 +255,11 @@ class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
     periods = [
-        "year",
-        "6months",
-        "9months",
-        "10months",
-        "11months",
+        # "year",
+        # "6months",
+        # "9months",
+        # "10months",
+        # "11months",
         "jan",
         "feb",
         "mar",
@@ -272,6 +272,17 @@ class ContractFabric(View):
         "oct",
         "nov",
         "dec",
+    ]
+    hidden_period =[
+        "year",
+        "6months",
+        "9months",
+        "10months",
+        "11months",
+        "1quart",
+        "2quart",
+        "3quart",
+        "4quart",
     ]
 
     def get(self, request, contract_id=None):
@@ -292,41 +303,14 @@ class ContractFabric(View):
             sum_rur_form = SumsRURForm
             SumBYNFormSet = formset_factory(SumsBYNForm, extra=0)  # создает НОВЫЕ
             formset = SumBYNFormSet(initial=[  # для создание нового договора
-                {'period': '1quart'},
-                {'period': '2quart'},
-                {'period': '3quart'},
-                {'period': '4quart'},
+                # {'period': '1quart'},
+                # {'period': '2quart'},
+                # {'period': '3quart'},
+                # {'period': '4quart'},
             ])
         else:
-            # if request.user.has_perm('planes:change_contract'):
-                # return HttpResponse(request.user.groups.all())
-            if request.user.groups.filter(name='economists'):
-                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_economist, extra=0)  # Берет ИЗ БД
-                formset = SumBYNFormSet(
-                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
-                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
-
-            elif request.user.groups.filter(name='lawyers'):
-                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_lawyer, extra=0)  # Берет ИЗ БД
-                formset = SumBYNFormSet(
-                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
-                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
-
-            elif request.user.groups.filter(name='asez'):
-                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_asez, extra=0)  # Берет ИЗ БД
-                formset = SumBYNFormSet(
-                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
-                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
-
-            else:
-                SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
-                formset = SumBYNFormSet(
-                    queryset=SumsBYN.objects.filter(contract__id=contract_id))  # для вызова из бд
-                contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-                sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+            user_groups = request.user.groups
+            formset, contract_form, sum_rur_form = self.choose_formset(user_groups, contract_id)
 
         return render(request,
                       template_name=self.create_or_add,
@@ -369,6 +353,25 @@ class ContractFabric(View):
         else:
             print(formset.errors)
             return HttpResponse(formset.errors)
+
+    def choose_formset(self, user_groups, contract_id):
+        if user_groups.filter(name='economists'):
+            choosed_form = SumsBYNForm_economist
+        elif user_groups.filter(name='lawyers'):
+            choosed_form = SumsBYNForm_lawyer
+        elif user_groups.filter(name='lawyers'):
+            choosed_form = SumsBYNForm_lawyer
+        else:
+            choosed_form = SumsBYNForm
+
+        SumBYNFormSet = modelformset_factory(SumsBYN, choosed_form, extra=0)  # Берет ИЗ БД
+        formset = SumBYNFormSet(
+            queryset=SumsBYN.objects.filter(
+                contract__id=contract_id).exclude(period__in=self.hidden_period)
+        )
+        contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+        sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+        return formset, contract_form, sum_rur_form
 
 
 def adding_click_to_UserActivityJournal(request):
