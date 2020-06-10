@@ -240,6 +240,55 @@ class DeletedContracts(View):
         return contract_to_recover
 
 
+from decimal import Decimal
+def test(request):
+    periods = [
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+    ]
+    quarts = [
+        "1quart",
+        "2quart",
+        "3quart",
+        "4quart",
+    ]
+
+    contract = Contract.objects.latest('id')
+    sum_b = SumsBYN.objects.filter(contract=contract)
+
+
+    if request.method == "POST":
+        print(request.POST)
+        for m in periods:
+            mew = sum_b.get(period=m)
+            mew.forecast_total = Decimal(request.POST[f'forecast_{m}'])
+            mew.fact_total = Decimal(request.POST[f'fact_{m}'])
+            mew.save()
+        for q in quarts:
+            mew = sum_b.get(period=q)
+            mew.contract_sum_without_NDS_BYN = Decimal(request.POST[f'contract_sum_without_nds_{q}'])
+            mew.plan_sum_SAP = Decimal(request.POST[f'plan_SAP_{q}'])
+            mew.save()
+        return HttpResponse(request.POST)
+
+
+    return render(request, template_name='contracts/test.html', context={'contract':contract,
+                                                                         'sum_b':sum_b,
+                                                                         'periods':periods,
+                                                                         'quarts':quarts})
+
+
+
 class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
@@ -263,10 +312,10 @@ class ContractFabric(View):
         "9months",
         "10months",
         "11months",
-        "1quart",
-        "2quart",
-        "3quart",
-        "4quart",
+        # "1quart",
+        # "2quart",
+        # "3quart",
+        # "4quart",
     ]
 
     def get(self, request, contract_id=None):
