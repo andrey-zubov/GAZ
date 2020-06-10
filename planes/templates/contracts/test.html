@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Title</title>
+</head>
+<body>
+
+{{ contract }}
+<hr>
+
+<form method="post" action="">
+    {% csrf_token %}
+    {% for month in periods %}
+        Месяц {{ month }}<br>
+        Прогноз:
+        <input type="text" name="forecast_{{ month }}"><br>
+        Факт:
+        <input type="text" name="fact_{{ month }}">
+        <br><br>
+    {% endfor %}
+    {% for quart in quarts %}
+        Квартал {{ quart }}<br>
+        Плановая сумма САП:
+        <input type="text" name="plan_SAP_{{ quart }}">
+        <br>
+        Сумма договора без ндс:
+        <input type="text" name="contract_sum_without_nds_{{ quart }}">
+        <br>
+
+    {% endfor %}
+
+    <input type="text" name="test_in">
+
+
+    <button type="submit">ok</button>
+</form>
+</body>
+<script>
+    $('document').ready(function () {
+        console.log('ewtq');
+
+        $('.test_but').on('click', function () {
+            console.log('test')
+            var kek = $('.test').val()
+            console.log(kek)
+        });
+
+
+    });
+</script>
+</html>
