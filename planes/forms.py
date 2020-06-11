@@ -49,6 +49,15 @@ class SumsBYNForm_months(forms.ModelForm): # TODO TESTdelete it away
             'fact_total',
             ]
 
+class SumsBYNForm_quarts(forms.ModelForm): # TODO TESTdelete it away
+    class Meta:
+        model = SumsBYN
+        fields = [
+            'period',
+            'plan_sum_SAP',
+            'contract_sum_without_NDS_BYN',
+        ]
+
 
 class SumsBYNForm(forms.ModelForm):
     class Meta:

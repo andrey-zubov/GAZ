@@ -12,7 +12,8 @@ from .forms import (
     SumsBYNForm_economist,
     SumsBYNForm_lawyer,
     SumsBYNForm_asez,
-    SumsBYNForm_months
+    SumsBYNForm_months,
+    SumsBYNForm_quarts
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -307,9 +308,10 @@ def double_formset(request):
     ]
     contract = Contract.objects.latest('id')
 
-    form_fac = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)
-    formset_1 = form_fac(queryset=SumsBYN.objects.filter(period__in=months))
-    formset_2 = form_fac(queryset=SumsBYN.objects.filter(period__in=quarts))
+    form_fac_1 = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)
+    formset_1 = form_fac_1(queryset=SumsBYN.objects.filter(period__in=months))
+    form_fac_2 = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
+    formset_2 = form_fac_2(queryset=SumsBYN.objects.filter(period__in=quarts))
 
 
     return render(request, template_name='contracts/double_test.html', context={'formset_1':formset_1,
@@ -364,7 +366,17 @@ class ContractFabric(View):
             formset = SumBYNFormSet()
         else:
             user_groups = request.user.groups
-            formset, contract_form, sum_rur_form = self.choose_formset(user_groups, contract_id)
+            SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)  # Берет ИЗ БД
+            formset = SumBYNFormSet(
+                queryset=SumsBYN.objects.filter(
+                    contract__id=contract_id).exclude(period__in=self.hidden_period)
+            )
+            contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+            sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+            return formset, contract_form, sum_rur_form
+
+
+           # formset, contract_form, sum_rur_form = self.choose_formset(user_groups, contract_id)
 
         return render(request,
                       template_name=self.create_or_add,
@@ -407,24 +419,24 @@ class ContractFabric(View):
             print(formset.errors)
             return HttpResponse(formset.errors)
 
-    def choose_formset(self, user_groups, contract_id):
-        if user_groups.filter(name='economists'):
-            choosed_form = SumsBYNForm_economist
-        elif user_groups.filter(name='lawyers'):
-            choosed_form = SumsBYNForm_lawyer
-        elif user_groups.filter(name='spec_ASEZ'):
-            choosed_form = SumsBYNForm_asez
-        else:
-            choosed_form = SumsBYNForm
-
-        SumBYNFormSet = modelformset_factory(SumsBYN, choosed_form, extra=0)  # Берет ИЗ БД
-        formset = SumBYNFormSet(
-            queryset=SumsBYN.objects.filter(
-                contract__id=contract_id).exclude(period__in=self.hidden_period)
-        )
-        contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-        sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
-        return formset, contract_form, sum_rur_form
+    # def choose_formset(self, user_groups, contract_id):
+    #     if user_groups.filter(name='economists'):
+    #         choosed_form = SumsBYNForm_economist
+    #     elif user_groups.filter(name='lawyers'):
+    #         choosed_form = SumsBYNForm_lawyer
+    #     elif user_groups.filter(name='spec_ASEZ'):
+    #         choosed_form = SumsBYNForm_asez
+    #     else:
+    #         choosed_form = SumsBYNForm
+    #
+    #     SumBYNFormSet = modelformset_factory(SumsBYN, choosed_form, extra=0)  # Берет ИЗ БД
+    #     formset = SumBYNFormSet(
+    #         queryset=SumsBYN.objects.filter(
+    #             contract__id=contract_id).exclude(period__in=self.hidden_period)
+    #     )
+    #     contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
+    #     sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+    #     return formset, contract_form, sum_rur_form
 
 
 def adding_click_to_UserActivityJournal(request):
