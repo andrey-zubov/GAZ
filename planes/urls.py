@@ -11,7 +11,8 @@ from .views import (
     plane,
     ContractFabric,
     DeletedContracts,
-test
+test,
+double_formset
 )
 
 app_name = "planes"
@@ -60,5 +61,6 @@ urlpatterns = [
         name='recover_contract'
          ),
 
-    path('test', test)
+    path('test', test),
+    path('double', double_formset)
 ]

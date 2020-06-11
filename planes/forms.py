@@ -40,6 +40,16 @@ class SumsRURForm(forms.ModelForm):
         exclude = ['contract']
 
 
+class SumsBYNForm_months(forms.ModelForm): # TODO TESTdelete it away
+    class Meta:
+        model = SumsBYN
+        fields = [
+            'period',
+            'forecast_total',
+            'fact_total',
+            ]
+
+
 class SumsBYNForm(forms.ModelForm):
     class Meta:
         model = SumsBYN

@@ -11,7 +11,8 @@ from .forms import (
     YearForm,
     SumsBYNForm_economist,
     SumsBYNForm_lawyer,
-    SumsBYNForm_asez
+    SumsBYNForm_asez,
+    SumsBYNForm_months
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -243,6 +244,20 @@ class DeletedContracts(View):
 from decimal import Decimal
 from moneyed import Money
 def test(request):
+    months = [
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+    ]
 
     contract = Contract.objects.latest('id')
     sum_b = SumsBYN.objects.filter(contract=contract)
@@ -252,14 +267,53 @@ def test(request):
     formset = SumBYNFormSet(queryset=SumsBYN.objects.all(),
                             initial=[])
     for form in formset:
-        form.fields['period'].widget.attrs['hidden'] = True
-        form.fields['period'].label = ''
-
+        # form.fields['period'].widget.attrs['hidden'] = True
+        # form.fields['period'].label = 'rewqrqre'
+        if form['period'].value() in months:
+            form.fields['period'].label = 'qq'  # TODO this line dont work in IF but works alone. waaaat
+            form.fields['plan_sum_SAP'].widget.attrs['hidden'] = True
+            form.fields['contract_sum_without_NDS_BYN'].widget.attrs['hidden'] = True
+            form.fields['economy_total'].widget.attrs['hidden'] = True
+            form.fields['economy_total'].label = ''
+            form.fields['contract_sum_without_NDS_BYN'].label = ''
+            form.fields['plan_sum_SAP'].label = ''
 
     return render(request, template_name='contracts/test.html', context={'contract':contract,
                                                                          'sum_b':sum_b,
                                                                          'contract_form':contract_form,
                                                                          'formset':formset})
+
+
+def double_formset(request):
+    months = [
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+    ]
+    quarts = [
+        "1quart",
+        "2quart",
+        "3quart",
+        "4quart",
+    ]
+    contract = Contract.objects.latest('id')
+
+    form_fac = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)
+    formset_1 = form_fac(queryset=SumsBYN.objects.filter(period__in=months))
+    formset_2 = form_fac(queryset=SumsBYN.objects.filter(period__in=quarts))
+
+
+    return render(request, template_name='contracts/double_test.html', context={'formset_1':formset_1,
+                                                                                'formset_2':formset_2})
 
 
 
