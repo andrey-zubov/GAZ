@@ -12,10 +12,17 @@
     {{ contract_form }}
     </table>
     <br>
-    {{ formset.management_form }}
+    {{ formset_months.management_form }}
     <table>
-        {% for form in formset %}
-        {{ form }}
+        {% for form in formset_months %}
+            {{ form }}
+        {% endfor %}
+    </table>
+    <hr><hr>
+    {{ formset_quarts.management_form }}
+    <table>
+        {% for form in formset_quarts %}
+            {{ form }}
         {% endfor %}
     </table>
     <br>
