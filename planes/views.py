@@ -241,51 +241,25 @@ class DeletedContracts(View):
 
 
 from decimal import Decimal
+from moneyed import Money
 def test(request):
-    periods = [
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-    ]
-    quarts = [
-        "1quart",
-        "2quart",
-        "3quart",
-        "4quart",
-    ]
 
     contract = Contract.objects.latest('id')
     sum_b = SumsBYN.objects.filter(contract=contract)
+    contract_form = ContractForm(instance=contract)
+    SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=1)  # Берет ИЗ БД
 
-
-    if request.method == "POST":
-        print(request.POST)
-        for m in periods:
-            mew = sum_b.get(period=m)
-            mew.forecast_total = Decimal(request.POST[f'forecast_{m}'])
-            mew.fact_total = Decimal(request.POST[f'fact_{m}'])
-            mew.save()
-        for q in quarts:
-            mew = sum_b.get(period=q)
-            mew.contract_sum_without_NDS_BYN = Decimal(request.POST[f'contract_sum_without_nds_{q}'])
-            mew.plan_sum_SAP = Decimal(request.POST[f'plan_SAP_{q}'])
-            mew.save()
-        return HttpResponse(request.POST)
+    formset = SumBYNFormSet(queryset=SumsBYN.objects.all(),
+                            initial=[])
+    for form in formset:
+        form.fields['period'].widget.attrs['hidden'] = True
+        form.fields['period'].label = ''
 
 
     return render(request, template_name='contracts/test.html', context={'contract':contract,
                                                                          'sum_b':sum_b,
-                                                                         'periods':periods,
-                                                                         'quarts':quarts})
+                                                                         'contract_form':contract_form,
+                                                                         'formset':formset})
 
 
 
@@ -371,7 +345,6 @@ class ContractFabric(View):
             if create_periods_flag:
                 for p in self.periods:
                     new_sum_byn = SumsBYN.objects.create(period=p, contract=new_contract)
-
             new_sum_rur = sum_rur_form.save(commit=False)
             new_sum_rur.contract = new_contract
             new_sum_rur.save()
