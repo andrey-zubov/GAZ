@@ -11,7 +11,12 @@
     <table>
     {{ contract_form }}
     </table>
+
     <br>
+    <table>
+        {{ sum_byn_year_form }}
+    </table>
+    <hr><hr>
     {{ formset_months.management_form }}
     <table>
         {% for form in formset_months %}
@@ -19,6 +24,7 @@
         {% endfor %}
     </table>
     <hr><hr>
+
     {{ formset_quarts.management_form }}
     <table>
         {% for form in formset_quarts %}
@@ -26,9 +32,11 @@
         {% endfor %}
     </table>
     <br>
+
     <table>
     {{ rur_form }}
     </table>
+
     <button type="submit">ОК</button>
 </form>
 

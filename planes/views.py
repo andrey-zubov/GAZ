@@ -13,7 +13,8 @@ from .forms import (
     SumsBYNForm_lawyer,
     SumsBYNForm_asez,
     SumsBYNForm_months,
-    SumsBYNForm_quarts
+    SumsBYNForm_quarts,
+    SumsBYNForm_year,
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -368,6 +369,8 @@ class ContractFabric(View):
             ''' Create new contract with initial sumBYN and sumRUR'''
             contract_form = ContractForm
             sum_rur_form = SumsRURForm
+            sum_byn_year_form = SumsBYNForm_year
+
             SumBYNFormSet_months = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)  # Берет ИЗ БД
             SumBYNFormSet_quarts = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
             contract_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
@@ -395,7 +398,10 @@ class ContractFabric(View):
                 prefix='quarts'
             )
 
-
+            sum_byn_year_form = SumsBYNForm_year(instance=get_object_or_404(SumsBYN,
+                                                                       Q(contract__id=contract_id),
+                                                                       Q(period='year'),
+            ))
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
 
@@ -408,7 +414,7 @@ class ContractFabric(View):
                       context={
                           'formset_months':formset_months,
                           'formset_quarts':formset_quarts,
-                         # 'formset': formset,
+                          'sum_byn_year_form': sum_byn_year_form,
                           'contract_form':contract_form,
                           'rur_form':sum_rur_form,
                       })
@@ -421,17 +427,26 @@ class ContractFabric(View):
             instance_contract = None
             instance_rur = None
             create_periods_flag = True
+            instance_bun_year = None
         else:
             # SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=0)  # Берет ИЗ БД
             SumBYNFormSet_months = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)
             SumBYNFormSet_quarts = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
             instance_contract = get_object_or_404(Contract, id=contract_id)
             instance_rur = get_object_or_404(SumsRUR, contract__id=contract_id)
+            instance_bun_year = get_object_or_404(SumsBYN,
+                                                  Q(contract__id=contract_id),
+                                                  Q(period='year'
+                                                    ))
             create_periods_flag = False
+            # sum_byn_year_form = SumsBYNForm(instance=get_object_or_404(SumsBYN,
+            #                                                            Q(contract__id=contract_id),
+            #                                                            Q(period='year'),
+            # ))
 
         contract_form = ContractForm(request.POST, instance=instance_contract)
         sum_rur_form = SumsRURForm(request.POST, instance=instance_rur)
-        # formset = SumBYNFormSet(request.POST)
+        sum_byn_year_form = SumsBYNForm_year(request.POST, instance=instance_bun_year)
 
         contract_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
         formset_months = SumBYNFormSet_months(request.POST, prefix='months')
@@ -439,10 +454,14 @@ class ContractFabric(View):
 
         if sum_rur_form.is_valid() \
                 and contract_form.is_valid() \
+                and sum_byn_year_form.is_valid() \
                 and formset_months.is_valid() \
                 and formset_quarts.is_valid():
 
             new_contract = contract_form.save()
+            new_sum_byn_year = sum_byn_year_form.save(commit=False)
+            new_sum_byn_year.contract = new_contract
+            new_sum_byn_year.save()
             for form in formset_months:
                 new_sum_byn = form.save(commit=False)
                 new_sum_byn.contract = new_contract
@@ -459,27 +478,8 @@ class ContractFabric(View):
             new_sum_rur.save()
             return redirect(reverse('planes:contracts'))
         else:
-            print(formset_quarts.errors, formset_months.errors)
-            return HttpResponse(formset_quarts.errors, formset_months.errors)
-
-    # def choose_formset(self, user_groups, contract_id):
-    #     if user_groups.filter(name='economists'):
-    #         choosed_form = SumsBYNForm_economist
-    #     elif user_groups.filter(name='lawyers'):
-    #         choosed_form = SumsBYNForm_lawyer
-    #     elif user_groups.filter(name='spec_ASEZ'):
-    #         choosed_form = SumsBYNForm_asez
-    #     else:
-    #         choosed_form = SumsBYNForm
-    #
-    #     SumBYNFormSet = modelformset_factory(SumsBYN, choosed_form, extra=0)  # Берет ИЗ БД
-    #     formset = SumBYNFormSet(
-    #         queryset=SumsBYN.objects.filter(
-    #             contract__id=contract_id).exclude(period__in=self.hidden_period)
-    #     )
-    #     contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
-    #     sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
-    #     return formset, contract_form, sum_rur_form
+            print(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
+            return HttpResponse(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
 
 
 def adding_click_to_UserActivityJournal(request):
