@@ -309,9 +309,9 @@ def double_formset(request):
     contract = Contract.objects.latest('id')
 
     form_fac_1 = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)
-    formset_1 = form_fac_1(queryset=SumsBYN.objects.filter(period__in=months))
+    formset_1 = form_fac_1(queryset=SumsBYN.objects.filter(period__in=months), prefix='test_1')
     form_fac_2 = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
-    formset_2 = form_fac_2(queryset=SumsBYN.objects.filter(period__in=quarts))
+    formset_2 = form_fac_2(queryset=SumsBYN.objects.filter(period__in=quarts), prefix='test_2')
 
 
     return render(request, template_name='contracts/double_test.html', context={'formset_1':formset_1,
@@ -372,10 +372,12 @@ class ContractFabric(View):
             SumBYNFormSet_quarts = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
             contract_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
             formset_months = SumBYNFormSet_months(
-                queryset=contract_sum_byn.filter(period__in=self.periods)
+                queryset=contract_sum_byn.filter(period__in=self.periods),
+                prefix='months'
             )
             formset_quarts = SumBYNFormSet_quarts(
-                queryset=contract_sum_byn.filter(period__in=self.quarts)
+                queryset=contract_sum_byn.filter(period__in=self.quarts),
+                prefix='months'
             )
 
         else:
@@ -385,10 +387,12 @@ class ContractFabric(View):
 
             contract_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
             formset_months = SumBYNFormSet_months(
-                queryset=contract_sum_byn.filter(period__in=self.periods)
+                queryset=contract_sum_byn.filter(period__in=self.periods),
+                prefix='months'
             )
             formset_quarts = SumBYNFormSet_quarts(
-                queryset=contract_sum_byn.filter(period__in=self.quarts)
+                queryset=contract_sum_byn.filter(period__in=self.quarts),
+                prefix='quarts'
             )
 
 
@@ -430,8 +434,8 @@ class ContractFabric(View):
         # formset = SumBYNFormSet(request.POST)
 
         contract_sum_byn = SumsBYN.objects.filter(contract__id=contract_id)
-        formset_months = SumBYNFormSet_months(request.POST)
-        formset_quarts = SumBYNFormSet_quarts(request.POST)
+        formset_months = SumBYNFormSet_months(request.POST, prefix='months')
+        formset_quarts = SumBYNFormSet_quarts(request.POST, prefix='quarts')
 
         if sum_rur_form.is_valid() \
                 and contract_form.is_valid() \

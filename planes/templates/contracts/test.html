@@ -14,11 +14,15 @@
 <form method="post" action="">
     {% csrf_token %}
     <table>
-        {% for form in formset %}
+        {% for form in formset_1 %}
         {{ form }}
         {% endfor %}
     </table>
-
+    <table>
+        {% for form in formset_2 %}
+        {{ form }}
+        {% endfor %}
+    </table>
 
 
     <button type="submit">ok</button>
