@@ -278,6 +278,9 @@ def test(request):
             form.fields['contract_sum_without_NDS_BYN'].label = ''
             form.fields['plan_sum_SAP'].label = ''
 
+    if request.user.groups.filter(name='spec_ASEZ'):
+        return HttpResponse('spec_ASEZ')
+
     return render(request, template_name='contracts/test.html', context={'contract':contract,
                                                                          'sum_b':sum_b,
                                                                          'contract_form':contract_form,
@@ -366,7 +369,8 @@ class ContractFabric(View):
                 queryset=contract_sum_byn.filter(period__in=self.quarts),
                 prefix='months'
             )
-
+            for form in formset_months:  # this is props for month fields
+                pass
         else:
             user_groups = request.user.groups
             SumBYNFormSet_months = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)  # Берет ИЗ БД
@@ -388,6 +392,12 @@ class ContractFabric(View):
             ))
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
+
+        if request.user.groups.filter(name='lawyers').exists():  # if in group - get permission for fields
+            for form in formset_months:
+                form.fields['forecast_total'].widget.attrs['contenteditable'] = False
+        else:
+            return HttpResponse('not laweyr')
 
         return render(request,
                       template_name=self.create_or_add,
