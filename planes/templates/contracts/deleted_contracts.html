@@ -5,6 +5,10 @@
     <title>Title</title>
 </head>
 <body>
+<form>
+    <p><input type="search" name="search" placeholder="Поиск договора">
+        <input type="submit" value="Найти"></p>
+</form>
 {% for contract in contracts %}
   
 <a href="{% url 'planes:recover_contract' contract.id %}"> {{ contract }}</a><br>
