@@ -60,6 +60,8 @@ class SumsBYNForm_quarts(forms.ModelForm): # TODO TESTdelete it away
 
 
 class SumsBYNForm_year(forms.ModelForm):
+    class Media:
+        js = ('planes/js/script_form_year.js',)
     class Meta:
         model = SumsBYN
         fields = [

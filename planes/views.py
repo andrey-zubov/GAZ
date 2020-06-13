@@ -367,10 +367,11 @@ class ContractFabric(View):
             )
             formset_quarts = SumBYNFormSet_quarts(
                 queryset=contract_sum_byn.filter(period__in=self.quarts),
-                prefix='months'
+                prefix='quarts'
             )
             for form in formset_months:  # this is props for month fields
                 pass
+
         else:
             user_groups = request.user.groups
             SumBYNFormSet_months = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)  # Берет ИЗ БД
@@ -393,11 +394,11 @@ class ContractFabric(View):
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
 
-        if request.user.groups.filter(name='lawyers').exists():  # if in group - get permission for fields
-            for form in formset_months:
-                form.fields['forecast_total'].widget.attrs['contenteditable'] = False
-        else:
-            return HttpResponse('not laweyr')
+        # if request.user.groups.filter(name='lawyers').exists():  # if in group - get permission for fields
+        #     for form in formset_months:
+        #         form.fields['forecast_total'].widget.attrs['contenteditable'] = False
+        # else:
+        #     return HttpResponse('not laweyr')
 
         return render(request,
                       template_name=self.create_or_add,
@@ -434,6 +435,7 @@ class ContractFabric(View):
 
         formset_months = SumBYNFormSet_months(request.POST, prefix='months')
         formset_quarts = SumBYNFormSet_quarts(request.POST, prefix='quarts')
+
 
         if sum_rur_form.is_valid() \
                 and contract_form.is_valid() \

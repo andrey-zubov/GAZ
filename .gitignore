@@ -4,7 +4,6 @@
 **/settings.py
 **/.gitignore
 .vscode
-static
 /desc
 /Реестр договоров.xlsx
 /desk_lb.txt

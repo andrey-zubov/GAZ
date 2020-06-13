@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div id="data-container">
+
 <table border="1">
     <tr>
         <th>Наименование (предмет) договора, <br>доп соглашения к договору <br>СОДЕРЖАНИЕ РАБОТ</th>
@@ -298,9 +297,7 @@
 
 </div>
 
-
-
-</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $('document').ready(function () {
         $('.contract_choice').on('click', function (chose) {
@@ -345,4 +342,7 @@
 
     });
 </script>
-</html>
+
+    </div>
+
+{% endblock content %}

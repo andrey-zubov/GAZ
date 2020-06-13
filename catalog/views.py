@@ -21,13 +21,25 @@ def index(request):
     return render(request, 'catalog/index.html', context)
 
 def catalog_funding(request):
+    obj_list = FinanceCosts.objects.all().order_by('title')
+    name_list = []
+    for obj in obj_list:
+        name_list.append(obj.title)
+    v_name = FinanceCosts._meta.get_field('title').verbose_name
+
     CatalogFormset = modelformset_factory(FinanceCosts, form=forms.CatalogFinanceCostsForm, extra=0)
     formset = CatalogFormset()
     title = 'Статьи финансирования'
-    context = {'formset': formset, 'title': title}
+    context = {'formset': formset, 'title': title, 'queryset': name_list, 'v_name': v_name}
     return render(request, 'catalog/article.html', context)
 
 def catalog_activityform(request):
+    obj_list = FinanceCosts.objects.all().order_by('title')
+    name_list = []
+    for obj in obj_list:
+        name_list.append(obj.title)
+    v_name = FinanceCosts._meta.get_field('title').verbose_name
+
     CatalogFormset = modelformset_factory(ActivityForm, form=forms.CatalogActivityFormForm, extra=0)
     formset = CatalogFormset()
     title = 'Виды деятельности'
@@ -93,7 +105,7 @@ def catalog_usertypes(request):
 def catalog_numberpztru(request):
     CatalogFormset = modelformset_factory(NumberPZTRU, form=forms.CatalogNumberPZTRUForm, extra=0)
     formset = CatalogFormset()
-    title = '№ пункта положения о закупках'
+    title = 'Номер пункта Положения о закупках'
     context = {'formset': formset, 'title': title}
     return render(request, 'catalog/article.html', context)
 
