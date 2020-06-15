@@ -40,6 +40,37 @@ class SumsRURForm(forms.ModelForm):
         exclude = ['contract']
 
 
+class SumsBYNForm_months(forms.ModelForm): # TODO TESTdelete it away
+    class Meta:
+        model = SumsBYN
+        fields = [
+            'period',
+            'forecast_total',
+            'fact_total',
+            ]
+
+class SumsBYNForm_quarts(forms.ModelForm): # TODO TESTdelete it away
+    class Meta:
+        model = SumsBYN
+        fields = [
+            'period',
+            'plan_sum_SAP',
+            'contract_sum_without_NDS_BYN',
+        ]
+
+
+class SumsBYNForm_year(forms.ModelForm):
+    class Media:
+        js = ('planes/js/script_form_year.js',)
+    class Meta:
+        model = SumsBYN
+        fields = [
+            'period',
+            'contract_sum_with_NDS_BYN',
+            'contract_sum_without_NDS_BYN',
+        ]
+
+
 class SumsBYNForm(forms.ModelForm):
     class Meta:
         model = SumsBYN

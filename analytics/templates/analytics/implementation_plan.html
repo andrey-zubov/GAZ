@@ -3,119 +3,125 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+{#<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">#}
 
-<div class="container-fluid">
-  <h1> Исполнение плана по Минскому УМГ</h1>
-  <h4>По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за год {{year}}</h4>
+<div class="headline">
+  <h1>Исполнение плана по Минскому УМГ</h1>
+  <h2>По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за год {{year}}</h2>
+</div>
 
-  <div class="row">
-    <div class="col-sm-5" ">
-                <div class="chart-container" style="position: relative">
-
-<canvas id="myChart" ></canvas></div>
-
-<table   class="table-responsive" border="1">
-
-    <tr>
-        <th> Показатель </th>
-        <th> 1 квартал </th>
-        <th> 2 квартал </th>
-        <th> 3 квартал </th>
-        <th> 4 квартал </th>
-        <th> 6 месяцев </th>
-        <th> 9 месяцев </th>
-        <th> Год </th>
-    </tr>
-    <tr>
-        {% for plan in planning %}
-        <td > Лимит средств (План). По заказам ТОРО  </td>
-        <td> {{plan.q_1}}</td>
-        <td> {{plan.q_2}}</td>
-        <td> {{plan.q_3}}</td>
-        <td> {{plan.q_4}}</td>
-        <td> {{plan.q_6_months}}</td>
-        <td> {{plan.q_9_months}}</td>
-        <td> {{plan.q_all}}</td>
-    </tr>
-{% endfor %}
-
-    <tr>
-        <td> План по всем договорам </td>
-        <td> {{plan_sum_sap.1quart}}</td>
-        <td> {{plan_sum_sap.2quart}}</td>
-        <td> {{plan_sum_sap.3quart}}</td>
-        <td> {{plan_sum_sap.4quart}}</td>
-        <td> {{plan_sum_sap.6months}}</td>
-        <td> {{plan_sum_sap.9months}}</td>
-        <td> {{plan_sum_sap.year}}</td>
-    </tr>
-
-    <tr>
-        <td> Сумма заключенных договоров </td>
-        <td> {{contract_sum_without_NDS_BYN.1quart}}</td>
-        <td> {{contract_sum_without_NDS_BYN.2quart}}</td>
-        <td> {{contract_sum_without_NDS_BYN.3quart}}</td>
-        <td> {{contract_sum_without_NDS_BYN.4quart}}</td>
-        <td> {{contract_sum_without_NDS_BYN.6months}}</td>
-        <td> {{contract_sum_without_NDS_BYN.9months}}</td>
-        <td> {{contract_sum_without_NDS_BYN.year}}</td>
-    </tr>
-
-    <tr>
-        <td> Факт </td>
-        <td> {{fact_total.1quart}}</td>
-        <td> {{fact_total.2quart}}</td>
-        <td> {{fact_total.3quart}}</td>
-        <td> {{fact_total.4quart}}</td>
-        <td> {{fact_total.6months}}</td>
-        <td> {{fact_total.9months}}</td>
-        <td> {{fact_total.year}}</td>
-    </tr>
-
-    <tr>
-        <td> Прогноз </td>
-        <td> {{forecast_total.1quart}}</td>
-        <td> {{forecast_total.2quart}}</td>
-        <td> {{forecast_total.3quart}}</td>
-        <td> {{forecast_total.4quart}}</td>
-        <td> {{forecast_total.6months}}</td>
-        <td> {{forecast_total.9months}}</td>
-        <td> {{forecast_total.year}}</td>
-    </tr>
-
-     <tr>
-        <td> % выполнения плана </td>
-        <td> {%widthratio fact_total.1quart plannings.q_1 100%} %</td>
-        <td> {%widthratio fact_total.2quart plannings.q_2 100%} %</td>
-        <td> {%widthratio fact_total.3quart plannings.q_3 100%} %</td>
-        <td> {%widthratio fact_total.4quart plannings.q_4 100%} %</td>
-        <td> {%widthratio fact_total.6months plannings.q_6_months 100%} %</td>
-        <td> {%widthratio fact_total.9months plannings.q_9_months 100%} %</td>
-        <td> {%widthratio fact_total.year plannings.q_all 100%} %</td>
-    </tr>
-
-</table>
+{#<div class="container-fluid">#}
+<div id="data-container">
 
 
-    </div>
-    <div class="col-sm-3" ">
+    <div class="row container-col-flex">
+
+        <div class="col-sm-5 col-analytics-1">
             <div class="chart-container" style="position: relative">
-    <canvas id="contractCountAll" width="250" height="250"></canvas>
-</div>
+                <canvas id="myChart" ></canvas>
+            </div>
 
-<div class="chart-container" style="position: relative">
-    <canvas id="contractCountSub" width="250" height="250"></canvas>
-</div>
+            <table   class="table-responsive" border="1">
 
-<div class="chart-container" style="position: relative">
-    <canvas id="contractCountCentre" width="250" height="250"></canvas>
-</div>
-    </div>
-      <div class="col-sm-2" ">
+                <tr>
+                    <th> Показатель </th>
+                    <th> 1 квартал </th>
+                    <th> 2 квартал </th>
+                    <th> 3 квартал </th>
+                    <th> 4 квартал </th>
+                    <th> 6 месяцев </th>
+                    <th> 9 месяцев </th>
+                    <th> Год </th>
+                </tr>
+                <tr>
+                    {% for plan in planning %}
+                    <td > Лимит средств (План). По заказам ТОРО  </td>
+                    <td> {{plan.q_1}}</td>
+                    <td> {{plan.q_2}}</td>
+                    <td> {{plan.q_3}}</td>
+                    <td> {{plan.q_4}}</td>
+                    <td> {{plan.q_6_months}}</td>
+                    <td> {{plan.q_9_months}}</td>
+                    <td> {{plan.q_all}}</td>
+                </tr>
+            {% endfor %}
+
+                <tr>
+                    <td> План по всем договорам </td>
+                    <td> {{plan_sum_sap.1quart}}</td>
+                    <td> {{plan_sum_sap.2quart}}</td>
+                    <td> {{plan_sum_sap.3quart}}</td>
+                    <td> {{plan_sum_sap.4quart}}</td>
+                    <td> {{plan_sum_sap.6months}}</td>
+                    <td> {{plan_sum_sap.9months}}</td>
+                    <td> {{plan_sum_sap.year}}</td>
+                </tr>
+
+                <tr>
+                    <td> Сумма заключенных договоров </td>
+                    <td> {{contract_sum_without_NDS_BYN.1quart}}</td>
+                    <td> {{contract_sum_without_NDS_BYN.2quart}}</td>
+                    <td> {{contract_sum_without_NDS_BYN.3quart}}</td>
+                    <td> {{contract_sum_without_NDS_BYN.4quart}}</td>
+                    <td> {{contract_sum_without_NDS_BYN.6months}}</td>
+                    <td> {{contract_sum_without_NDS_BYN.9months}}</td>
+                    <td> {{contract_sum_without_NDS_BYN.year}}</td>
+                </tr>
+
+                <tr>
+                    <td> Факт </td>
+                    <td> {{fact_total.1quart}}</td>
+                    <td> {{fact_total.2quart}}</td>
+                    <td> {{fact_total.3quart}}</td>
+                    <td> {{fact_total.4quart}}</td>
+                    <td> {{fact_total.6months}}</td>
+                    <td> {{fact_total.9months}}</td>
+                    <td> {{fact_total.year}}</td>
+                </tr>
+
+                <tr>
+                    <td> Прогноз </td>
+                    <td> {{forecast_total.1quart}}</td>
+                    <td> {{forecast_total.2quart}}</td>
+                    <td> {{forecast_total.3quart}}</td>
+                    <td> {{forecast_total.4quart}}</td>
+                    <td> {{forecast_total.6months}}</td>
+                    <td> {{forecast_total.9months}}</td>
+                    <td> {{forecast_total.year}}</td>
+                </tr>
+
+                 <tr>
+                    <td> % выполнения плана </td>
+                    <td> {%widthratio fact_total.1quart plannings.q_1 100%} %</td>
+                    <td> {%widthratio fact_total.2quart plannings.q_2 100%} %</td>
+                    <td> {%widthratio fact_total.3quart plannings.q_3 100%} %</td>
+                    <td> {%widthratio fact_total.4quart plannings.q_4 100%} %</td>
+                    <td> {%widthratio fact_total.6months plannings.q_6_months 100%} %</td>
+                    <td> {%widthratio fact_total.9months plannings.q_9_months 100%} %</td>
+                    <td> {%widthratio fact_total.year plannings.q_all 100%} %</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+        <div class="col-sm-3 col-analytics-2">
+
+            <div class="chart-container" style="position: relative">
+                <canvas id="contractCountAll" width="250" height="250"></canvas>
+            </div>
+
+            <div class="chart-container" style="position: relative">
+                <canvas id="contractCountSub" width="250" height="250"></canvas>
+            </div>
+
+            <div class="chart-container" style="position: relative">
+                <canvas id="contractCountCentre" width="250" height="250"></canvas>
+            </div>
+
+        </div>
+
+        <div class="col-sm-2 col-analytics-3">
                   <form action="{% url 'analytics:implementation_plan'  %}" method="get" name="filter" class="form-group">
     <p><label for="year">Отчетный год </label>
         <select id="year" size="1" name="select_year" class="form-control" >
@@ -157,23 +163,42 @@
             <input type="submit" class="form_submit" value="OK" >
 
         </form>
-      </div>
-  </div>
+        </div>
+
+    </div>
 
     <div class="row">
-        <div class="col-sm-6" ></div>
-        <div class="col-sm-6">
-            <button type="button" >Печать</button>
-            <button type="button" >Отправить</button>
-            <button type="button" >Сохранить</button>
-            <button type="button" >
-                <a href="{% url 'analytics:analytics' %}">Назад</a></button>
+
+{#        <div class="col-sm-6" ></div>#}
+{#        <div class="col-sm-6">#}
+{#            <button type="button">Печать</button>#}
+{#            <button type="button">Отправить</button>#}
+{#            <button type="button">Сохранить</button>#}
+{#            <button type="button">#}
+{#                <a href="{% url 'analytics:analytics' %}">Назад</a>#}
+{#            </button>#}
+{#        </div>#}
+
+        <div class="buttons-container">
+            <button class="button" onclick="">Печать</button>
+            <button class="button" onclick="">Отправить</button>
+            <button class="button" onclick="">Сохранить</button>
+            <button class="button" onclick="history.back()">Назад</button>
+{#            <button type="button">#}
+{#                <a href="{% url 'analytics:analytics' %}">Назад</a>#}
+{#            </button>#}
         </div>
+
     </div>
+
 </div>
 
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+  <script src={%static "script.js"%}></script>
 
 <script>
 var ctx = document.getElementById('myChart').getContext('2d');

@@ -502,7 +502,7 @@ class SumsBYN(models.Model):
         verbose_name = 'Показатели договора в белорусских рублях'
         verbose_name_plural = 'Показатели договора в белорусских рублях'
 
-    # unique_together = [['contract', 'year', 'period']]
+    unique_together = [['contract', 'year', 'period']]
 
     YEARS = [
         ("2018", "2018"),
