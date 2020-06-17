@@ -394,6 +394,24 @@ class ContractFabric(View):
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
 
+        ''' readonly field for everyone '''
+        sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+        # TODO make it
+        if request.user.groups.filter(name='lawyers').exists():
+            for form in formset_quarts:
+                form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
+                form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+            for form in formset_months:
+                form.fields['forecast_total'].widget.attrs['readonly'] = 'readonly'
+                form.fields['fact_total'].widget.attrs['readonly'] = 'readonly'
+            sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+        if request.user.groups.filter(name='lawyers').exists():
+            pass
+
+
+
+
+
         # if request.user.groups.filter(name='lawyers').exists():  # if in group - get permission for fields
         #     for form in formset_months:
         #         form.fields['forecast_total'].widget.attrs['contenteditable'] = False
