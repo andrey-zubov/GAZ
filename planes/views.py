@@ -408,8 +408,8 @@ class ContractFabric(View):
             sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
 
             contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-            contract_form_flag_contract_mode = Contract.objects.get(id=contract_id).contract_mode
-
+            contract_form_flag_contract_mode = \
+                Contract.objects.get(id=contract_id).contract_mode.id
 
         if request.user.groups.filter(name='lawyers').exists():
             pass
@@ -460,7 +460,6 @@ class ContractFabric(View):
 
         formset_months = SumBYNFormSet_months(request.POST, prefix='months')
         formset_quarts = SumBYNFormSet_quarts(request.POST, prefix='quarts')
-
 
         if sum_rur_form.is_valid() \
                 and contract_form.is_valid() \

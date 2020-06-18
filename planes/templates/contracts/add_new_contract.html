@@ -13,7 +13,7 @@
     {% csrf_token %}
     <table>
         {% if contract_form_flag_contract_mode %}
-            <input name="contract_mode" value="{{ contract_form_flag_contract_mode }}" >
+            <input hidden name="contract_mode" value="{{ contract_form_flag_contract_mode }}" id="id_contract_mode">
         {% endif %}
 
         {{ contract_form }}
