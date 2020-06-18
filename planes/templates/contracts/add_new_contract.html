@@ -12,12 +12,18 @@
 <form action="" method="post">
     {% csrf_token %}
     <table>
-    {{ contract_form }}
+        {% if contract_form_flag_contract_mode %}
+            <input name="contract_mode" value="{{ contract_form_flag_contract_mode }}" >
+        {% endif %}
+
+        {{ contract_form }}
+
     </table>
 
     <br>
     <table>
         {{ sum_byn_year_form }}
+
     </table>
     <hr><hr>
     {{ formset_months.management_form }}

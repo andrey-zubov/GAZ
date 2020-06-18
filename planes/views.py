@@ -397,6 +397,7 @@ class ContractFabric(View):
         ''' readonly field for everyone '''
         sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
         # TODO make it
+        contract_form_flag_contract_mode = False
         if request.user.groups.filter(name='lawyers').exists():
             for form in formset_quarts:
                 form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
@@ -405,6 +406,11 @@ class ContractFabric(View):
                 form.fields['forecast_total'].widget.attrs['readonly'] = 'readonly'
                 form.fields['fact_total'].widget.attrs['readonly'] = 'readonly'
             sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+
+            contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
+            contract_form_flag_contract_mode = Contract.objects.get(id=contract_id).contract_mode
+
+
         if request.user.groups.filter(name='lawyers').exists():
             pass
 
@@ -421,6 +427,7 @@ class ContractFabric(View):
         return render(request,
                       template_name=self.create_or_add,
                       context={
+                          'contract_form_flag_contract_mode':contract_form_flag_contract_mode,
                           'formset_months':formset_months,
                           'formset_quarts':formset_quarts,
                           'sum_byn_year_form': sum_byn_year_form,
@@ -483,7 +490,7 @@ class ContractFabric(View):
         else:
             print(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
             return HttpResponse(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
-
+            # TODO
 
 def adding_click_to_UserActivityJournal(request):
      counter = UserActivityJournal.objects.get(user=request.user)
