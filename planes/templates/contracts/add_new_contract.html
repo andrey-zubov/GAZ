@@ -8,24 +8,16 @@
     <script src="{% static '/planes/js/script_form_year.js' %}"></script>
 </head>
 <body>
-{% for right in cant_do_this %}
-    <input name="{{ right }}" value="{{right}}" id="id_{{ right }}">
-    {{ right }}<br>
-{% endfor %}
+
 
 <form action="" method="post">
     {% csrf_token %}
     <table>
+        {% for right in cant_do_this %}
+            <input name="{{ right.name }}" value="{{right.value}}" id="id_{{ right.name }}">
+            {{ right }}<br>
+        {% endfor %}
 
-<!--        {% if contract_mode_flag %}-->
-<!--            <input hidden name="contract_mode" value="{{ contract_mode_flag }}" id="id_contract_mode">-->
-<!--        {% endif %}-->
-<!--        {% if finance_cost_flag %}-->
-<!--            <input hidden name="finance_cost" value="{{ finance_cost_flag }}" id="id_finance_cost">-->
-<!--        {% endif %}-->
-<!--        {% if activity_form_flag %}-->
-<!--            <input hidden name="activity_form" value="{{ activity_form_flag }}" id="id_activity_form">-->
-<!--        {% endif %}-->
 
         {{ contract_form }}
     </table>
