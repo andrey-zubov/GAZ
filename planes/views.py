@@ -303,6 +303,7 @@ class ContractFabric(View):
         "3quart",
         "4quart",
     ]
+    # all_fields_contract = [getattr(i, 'name') for i in Contract._meta.fields].remove('id')
 
     def get(self, request, contract_id=None):
         if request.GET.__contains__('from_ajax'):
@@ -365,7 +366,20 @@ class ContractFabric(View):
         activity_form_flag = False
 
         cant_do_this = []
-        lawyer_cant_do = ['finance_cost', 'activity_form']
+        lawyer_can_do = [
+            'contract_mode',
+            'number_ppz',
+            'contract_status',
+            'register_number_SAP',
+            'contract_number',
+            'fact_sign_date',
+            'start_date',
+            'end_time',
+            'counterpart',
+        ]
+        lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
+        lawyer_cant_do.remove('id')
+        print(lawyer_cant_do)
         for right in lawyer_cant_do:
             dic = {}
             print(contract_form.fields[right])
@@ -373,10 +387,13 @@ class ContractFabric(View):
             attribute = getattr(Contract.objects.get(id=contract_id), right)
             # TODO check if class is not FK then do any
             dic['name'] = right
-            dic['value'] = attribute.id
+            try:
+                dic['value'] = attribute.id
+            except:
+                dic['value'] = attribute
             cant_do_this.append(dic)
 
-            #print(cant_do_this)
+
 
 
         # if request.user.groups.filter(name='lawyers').exists():
