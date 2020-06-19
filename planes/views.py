@@ -394,6 +394,9 @@ class ContractFabric(View):
             contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
             contract_mode_flag = \
                 Contract.objects.get(id=contract_id).contract_mode.id
+            contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
+            activity_form_flag = \
+                Contract.objects.get(id=contract_id).activity_form.id
 
 
 
