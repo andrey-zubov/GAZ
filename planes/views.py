@@ -376,9 +376,18 @@ class ContractFabric(View):
             'start_date',
             'end_time',
             'counterpart',
+            'related_contract'
         ]
-        lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
-        lawyer_cant_do.remove('id')
+        # lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
+        lawyer_cant_do = [
+            'finance_cost',
+            'title',
+
+        ]
+       # lawyer_cant_do.remove('id')
+       #  for i in lawyer_can_do:
+       #      lawyer_cant_do.remove(i)
+
         print(lawyer_cant_do)
         for right in lawyer_cant_do:
             dic = {}
