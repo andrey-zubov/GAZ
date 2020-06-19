@@ -364,6 +364,15 @@ class ContractFabric(View):
         finance_cost_flag = False
         activity_form_flag = False
 
+        cant_do_this = {}
+        lawyer_cant_do = ['finance_cost', 'activity_form']
+        for right in lawyer_cant_do:
+            # contract_form.fields[right].widget.attrs['readonly'] = 'readonly'
+
+            attribute = getattr(Contract.objects.get(id=contract_id), right)
+            cant_do_this[right] = attribute.id
+
+
         if request.user.groups.filter(name='lawyers').exists():
             for form in formset_quarts:  # make fields readonly
                 form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
@@ -416,6 +425,7 @@ class ContractFabric(View):
                           'contract_mode_flag':contract_mode_flag,
                           'finance_cost_flag':finance_cost_flag,
                           'activity_form_flag':activity_form_flag,
+                          'cant_do_this':cant_do_this,
 
                           'formset_months':formset_months,
                           'formset_quarts':formset_quarts,
