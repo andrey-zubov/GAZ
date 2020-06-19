@@ -12,18 +12,21 @@
 <form action="" method="post">
     {% csrf_token %}
     <table>
-        {% if contract_form_flag_contract_mode %}
-            <input hidden name="contract_mode" value="{{ contract_form_flag_contract_mode }}" id="id_contract_mode">
+        {% if contract_mode_flag %}
+            <input hidden name="contract_mode" value="{{ contract_mode_flag }}" id="id_contract_mode">
+        {% endif %}
+        {% if finance_cost_flag %}
+            <input hidden name="finance_cost" value="{{ finance_cost_flag }}" id="id_finance_cost">
+        {% endif %}
+        {% if activity_form_flag %}
+            <input hidden name="activity_form" value="{{ activity_form_flag }}" id="id_activity_form">
         {% endif %}
 
         {{ contract_form }}
-
     </table>
-
     <br>
     <table>
         {{ sum_byn_year_form }}
-
     </table>
     <hr><hr>
     {{ formset_months.management_form }}

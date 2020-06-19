@@ -244,47 +244,9 @@ class DeletedContracts(View):
 
 
 def test(request):
-    months = [
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-    ]
 
-    contract = Contract.objects.latest('id')
-    sum_b = SumsBYN.objects.filter(contract=contract)
-    contract_form = ContractForm(instance=contract)
-    SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=1)  # Берет ИЗ БД
 
-    formset = SumBYNFormSet(queryset=SumsBYN.objects.all(),
-                            initial=[])
-    for form in formset:
-        # form.fields['period'].widget.attrs['hidden'] = True
-        # form.fields['period'].label = 'rewqrqre'
-        if form['period'].value() in months:
-            form.fields['period'].label = 'qq'  # TODO this line dont work in IF but works alone. waaaat
-            form.fields['plan_sum_SAP'].widget.attrs['hidden'] = True
-            form.fields['contract_sum_without_NDS_BYN'].widget.attrs['hidden'] = True
-            form.fields['economy_total'].widget.attrs['hidden'] = True
-            form.fields['economy_total'].label = ''
-            form.fields['contract_sum_without_NDS_BYN'].label = ''
-            form.fields['plan_sum_SAP'].label = ''
-
-    if request.user.groups.filter(name='spec_ASEZ'):
-        return HttpResponse('spec_ASEZ')
-
-    return render(request, template_name='contracts/test.html', context={'contract':contract,
-                                                                         'sum_b':sum_b,
-                                                                         'contract_form':contract_form,
-                                                                         'formset':formset})
+    return render(request, template_name='contracts/test.html', context={})
 
 
 def double_formset(request):
@@ -397,22 +359,43 @@ class ContractFabric(View):
         ''' readonly field for everyone '''
         sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
         # TODO make it
-        contract_form_flag_contract_mode = False
+
+        contract_mode_flag = False
+        finance_cost_flag = False
+        activity_form_flag = False
+
         if request.user.groups.filter(name='lawyers').exists():
-            for form in formset_quarts:
+            for form in formset_quarts:  # make fields readonly
                 form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
                 form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
-            for form in formset_months:
+            for form in formset_months:  # make fields readonly
                 form.fields['forecast_total'].widget.attrs['readonly'] = 'readonly'
                 form.fields['fact_total'].widget.attrs['readonly'] = 'readonly'
             sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
 
+            contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
+            finance_cost_flag = \
+                Contract.objects.get(id=contract_id).finance_cost.id
+            contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
+            activity_form_flag = \
+                Contract.objects.get(id=contract_id).activity_form.id
+
+        # economists disabled fields
+        if request.user.groups.filter(name='economists').exists():
             contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-            contract_form_flag_contract_mode = \
+            contract_mode_flag = \
+                Contract.objects.get(id=contract_id).contract_mode.id
+            contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
+            finance_cost_flag = \
+                Contract.objects.get(id=contract_id).finance_cost.id
+
+        # spec asez disabled fields
+        if request.user.groups.filter(name='spec_ASEZ').exists():
+            contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
+            contract_mode_flag = \
                 Contract.objects.get(id=contract_id).contract_mode.id
 
-        if request.user.groups.filter(name='lawyers').exists():
-            pass
+
 
 
 
@@ -427,7 +410,10 @@ class ContractFabric(View):
         return render(request,
                       template_name=self.create_or_add,
                       context={
-                          'contract_form_flag_contract_mode':contract_form_flag_contract_mode,
+                          'contract_mode_flag':contract_mode_flag,
+                          'finance_cost_flag':finance_cost_flag,
+                          'activity_form_flag':activity_form_flag,
+
                           'formset_months':formset_months,
                           'formset_quarts':formset_quarts,
                           'sum_byn_year_form': sum_byn_year_form,
