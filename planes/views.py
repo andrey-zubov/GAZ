@@ -315,6 +315,11 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
+        contract_mode_flag = False
+        finance_cost_flag = False
+        activity_form_flag = False
+        cant_do_this = []
+
         if not contract_id:
             ''' Create new contract with initial sumBYN and sumRUR'''
             contract_form = ContractForm
@@ -357,99 +362,96 @@ class ContractFabric(View):
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
 
-        ''' readonly field for everyone '''
-        sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
-        # TODO make it
-
-        contract_mode_flag = False
-        finance_cost_flag = False
-        activity_form_flag = False
-
-        cant_do_this = []
-        lawyer_can_do = [
-            'contract_mode',
-            'number_ppz',
-            'contract_status',
-            'register_number_SAP',
-            'contract_number',
-            'fact_sign_date',
-            'start_date',
-            'end_time',
-            'counterpart',
-            'related_contract'
-        ]
-        # lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
-        lawyer_cant_do = [
-            'finance_cost',
-            'title',
-
-        ]
-       # lawyer_cant_do.remove('id')
-       #  for i in lawyer_can_do:
-       #      lawyer_cant_do.remove(i)
-
-        print(lawyer_cant_do)
-        for right in lawyer_cant_do:
-            dic = {}
-            print(contract_form.fields[right])
-            contract_form.fields[right].widget.attrs['disabled'] = 'disabled'
-            attribute = getattr(Contract.objects.get(id=contract_id), right)
-            # TODO check if class is not FK then do any
-            dic['name'] = right
-            try:
-                dic['value'] = attribute.id
-            except:
-                dic['value'] = attribute
-            cant_do_this.append(dic)
+            ''' readonly field for everyone '''
+            sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+            # TODO make it
 
 
 
+            contract_mode_flag = False
+            finance_cost_flag = False
+            activity_form_flag = False
 
-        # if request.user.groups.filter(name='lawyers').exists():
-        #     for form in formset_quarts:  # make fields readonly
-        #         form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
-        #         form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
-        #     for form in formset_months:  # make fields readonly
-        #         form.fields['forecast_total'].widget.attrs['readonly'] = 'readonly'
-        #         form.fields['fact_total'].widget.attrs['readonly'] = 'readonly'
-        #     sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
-        #
-        #     contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
-        #     finance_cost_flag = \
-        #         Contract.objects.get(id=contract_id).finance_cost.id
-        #     contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
-        #     activity_form_flag = \
-        #         Contract.objects.get(id=contract_id).activity_form.id
+            cant_do_this = []
+            lawyer_can_do = [
+                'contract_mode',
+                'number_ppz',
+                'contract_status',
+                'register_number_SAP',
+                'contract_number',
+                'fact_sign_date',
+                'start_date',
+                'end_time',
+                'counterpart',
+                'related_contract'
+            ]
+            # lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
+            lawyer_cant_do = [
+                'finance_cost',
+                'title',
 
-        # economists disabled fields
-        if request.user.groups.filter(name='economists').exists():
-            contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-            contract_mode_flag = \
-                Contract.objects.get(id=contract_id).contract_mode.id
-            contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
-            finance_cost_flag = \
-                Contract.objects.get(id=contract_id).finance_cost.id
+            ]
+           # lawyer_cant_do.remove('id')
+           #  for i in lawyer_can_do:
+           #      lawyer_cant_do.remove(i)
 
-        # spec asez disabled fields
-        if request.user.groups.filter(name='spec_ASEZ').exists():
-            contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-            contract_mode_flag = \
-                Contract.objects.get(id=contract_id).contract_mode.id
-            contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
-            activity_form_flag = \
-                Contract.objects.get(id=contract_id).activity_form.id
+            print(lawyer_cant_do)
+            for right in lawyer_cant_do:
+                dic = {}
+                print(contract_form.fields[right])
+                contract_form.fields[right].widget.attrs['disabled'] = 'disabled'
+                attribute = getattr(Contract.objects.get( id=contract_id), right)
+                # TODO check if class is not FK then do any
+                dic['name'] = right
+                try:
+                    dic['value'] = attribute.id
+                except:
+                    dic['value'] = attribute
+                cant_do_this.append(dic)
 
 
 
 
+            # if request.user.groups.filter(name='lawyers').exists():
+            #     for form in formset_quarts:  # make fields readonly
+            #         form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
+            #         form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+            #     for form in formset_months:  # make fields readonly
+            #         form.fields['forecast_total'].widget.attrs['readonly'] = 'readonly'
+            #         form.fields['fact_total'].widget.attrs['readonly'] = 'readonly'
+            #     sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+            #
+            #     contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
+            #     finance_cost_flag = \
+            #         Contract.objects.get(id=contract_id).finance_cost.id
+            #     contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
+            #     activity_form_flag = \
+            #         Contract.objects.get(id=contract_id).activity_form.id
+
+            # economists disabled fields
+            if request.user.groups.filter(name='economists').exists():
+                contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
+                contract_mode_flag = \
+                    Contract.objects.get(id=contract_id).contract_mode.id
+                contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
+                finance_cost_flag = \
+                    Contract.objects.get(id=contract_id).finance_cost.id
+
+            # spec asez disabled fields
+            if request.user.groups.filter(name='spec_ASEZ').exists():
+                contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
+                contract_mode_flag = \
+                    Contract.objects.get(id=contract_id).contract_mode.id
+                contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
+                activity_form_flag = \
+                    Contract.objects.get(id=contract_id).activity_form.id
 
 
 
-        # if request.user.groups.filter(name='lawyers').exists():  # if in group - get permission for fields
-        #     for form in formset_months:
-        #         form.fields['forecast_total'].widget.attrs['contenteditable'] = False
-        # else:
-        #     return HttpResponse('not laweyr')
+
+
+
+
 
         return render(request,
                       template_name=self.create_or_add,
@@ -518,7 +520,12 @@ class ContractFabric(View):
             new_sum_rur.save()
             return redirect(reverse('planes:contracts'))
         else:
-            print(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
+            print( sum_rur_form.is_valid(),
+                   contract_form.is_valid(),
+                   sum_byn_year_form.is_valid(),
+                   formset_months.is_valid(),
+                   formset_quarts.is_valid())
+
             return HttpResponse(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
             # TODO
 
