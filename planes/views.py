@@ -341,7 +341,6 @@ class ContractFabric(View):
                 pass
 
         else:
-            user_groups = request.user.groups
             SumBYNFormSet_months = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)  # Берет ИЗ БД
             SumBYNFormSet_quarts = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
 
@@ -364,7 +363,7 @@ class ContractFabric(View):
 
             ''' readonly field for everyone '''
             sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
-            # TODO make it
+
 
 
 
@@ -374,8 +373,12 @@ class ContractFabric(View):
 
             block_list = [getattr(i, 'name') for i in Contract._meta.fields]
 
-
-            lawyer_can_do = [
+            user_groups = request.user.groups.all()
+            print(user_groups)
+            # if 'layers' in  request.user.groups:
+            #     print('tis is law')
+            user_rights = {}
+            user_rights['lawyers'] = [
                 'id',  # id need course you can create new or etc
                 'contract_mode',
                 'number_ppz',
@@ -388,32 +391,40 @@ class ContractFabric(View):
                 'counterpart',
                 'related_contract'
             ]
-            economists_can-do = [
-
-
+            user_rights['economists'] = [
+                'finance_cost',
+                'activity_form',
             ]
 
-            # lawyer_cant_do = [
-            #
-            #     'title',
-            #     'curator',
-            #     'contract_type',
-            #     'purchase_type',
-            #     'number_PZTRU',
-            #     'stateASEZ',
-            #     'plan_load_date_ASEZ',
-            #     'fact_load_date_ASEZ',
-            #     'currency',
-            #     'number_KGG',
-            #     'plan_sign_date',
-            #
+            # lawyer_can_do = [
+            #     'id',  # id need course you can create new or etc
+            #     'contract_mode',
+            #     'number_ppz',
+            #     'contract_status',
+            #     'register_number_SAP',
+            #     'contract_number',
+            #     'fact_sign_date',
+            #     'start_date',
+            #     'end_time',
+            #     'counterpart',
+            #     'related_contract'
+            # ]
+            # economists_can_do = [
+            #     'finance_cost',
+            #     'activity_form',
             # ]
 
-            lawyer_cant_do = [i for i in block_list if i not in lawyer_can_do]  # consiquances lawyer/blocklist
+            this_user_in_groups = [i.name for i in user_groups]
 
+            this_user_can_do = ['id', ]
+            for i in this_user_in_groups:
+                this_user_can_do.extend(user_rights[i])
 
+            this_user_can_do = set(this_user_can_do)
 
-            for right in lawyer_cant_do:
+            this_user_cant_do = [i for i in block_list if i not in this_user_can_do]
+
+            for right in this_user_cant_do:
                 dic = {}
 
                 contract_form.fields[right].widget.attrs['disabled'] = 'disabled'
@@ -443,16 +454,11 @@ class ContractFabric(View):
                 sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
 
 
+            # economists readonly fields - no readonly fields
 
-            #
-            # # economists disabled fields
-            # if request.user.groups.filter(name='economists').exists():
-            #     contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-            #     contract_mode_flag = \
-            #         Contract.objects.get(id=contract_id).contract_mode.id
-            #     contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
-            #     finance_cost_flag = \
-            #         Contract.objects.get(id=contract_id).finance_cost.id
+
+
+
             #
             # # spec asez disabled fields
             # if request.user.groups.filter(name='spec_ASEZ').exists():
