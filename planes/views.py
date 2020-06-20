@@ -376,6 +376,7 @@ class ContractFabric(View):
 
 
             lawyer_can_do = [
+                'id',  # id need course you can create new or etc
                 'contract_mode',
                 'number_ppz',
                 'contract_status',
@@ -387,29 +388,29 @@ class ContractFabric(View):
                 'counterpart',
                 'related_contract'
             ]
-            # lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
+            economists_can-do = [
 
-            lawyer_cant_do = [
-
-                'title',
-                'curator',
-                'contract_type',
-                'purchase_type',
-                'number_PZTRU',
-                'stateASEZ',
-                'plan_load_date_ASEZ',
-                'fact_load_date_ASEZ',
-                'currency',
-                'number_KGG',
-                'plan_sign_date',
 
             ]
 
-            test = [i for i in block_list if i not in lawyer_cant_do]  # consiquances lawyer/blocklist
-            print(test)
-           # lawyer_cant_do.remove('id')
-           #  for i in lawyer_can_do:
-           #      lawyer_cant_do.remove(i)
+            # lawyer_cant_do = [
+            #
+            #     'title',
+            #     'curator',
+            #     'contract_type',
+            #     'purchase_type',
+            #     'number_PZTRU',
+            #     'stateASEZ',
+            #     'plan_load_date_ASEZ',
+            #     'fact_load_date_ASEZ',
+            #     'currency',
+            #     'number_KGG',
+            #     'plan_sign_date',
+            #
+            # ]
+
+            lawyer_cant_do = [i for i in block_list if i not in lawyer_can_do]  # consiquances lawyer/blocklist
+
 
 
             for right in lawyer_cant_do:
