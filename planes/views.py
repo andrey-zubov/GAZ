@@ -372,7 +372,9 @@ class ContractFabric(View):
             finance_cost_flag = False
             activity_form_flag = False
 
-            cant_do_this = []
+            cant_do_this = [getattr(i, 'name') for i in Contract._meta.fields]
+
+
             lawyer_can_do = [
                 'contract_mode',
                 'number_ppz',
@@ -387,6 +389,7 @@ class ContractFabric(View):
             ]
             # lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
             lawyer_cant_do = [  # TODO datefield to yyyy-mm-dd format
+
                 'finance_cost',
                 'title',
                 'curator',
@@ -401,6 +404,9 @@ class ContractFabric(View):
                 'plan_sign_date',
 
             ]
+
+            test = [i for i in cant_do_this if i not in lawyer_cant_do]
+            print(test)
            # lawyer_cant_do.remove('id')
            #  for i in lawyer_can_do:
            #      lawyer_cant_do.remove(i)
