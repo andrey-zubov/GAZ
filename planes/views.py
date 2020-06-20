@@ -386,27 +386,41 @@ class ContractFabric(View):
                 'related_contract'
             ]
             # lawyer_cant_do = [getattr(i, 'name') for i in Contract._meta.fields]
-            lawyer_cant_do = [
+            lawyer_cant_do = [  # TODO datefield to yyyy-mm-dd format
                 'finance_cost',
                 'title',
+                'curator',
+                'contract_type',
+                'purchase_type',
+                'number_PZTRU',
+                'stateASEZ',
+                'plan_load_date_ASEZ',
+                'fact_load_date_ASEZ',
+                'currency',
+                'number_KGG',
+                'plan_sign_date',
 
             ]
            # lawyer_cant_do.remove('id')
            #  for i in lawyer_can_do:
            #      lawyer_cant_do.remove(i)
 
-            print(lawyer_cant_do)
+
             for right in lawyer_cant_do:
                 dic = {}
-                print(contract_form.fields[right])
+
                 contract_form.fields[right].widget.attrs['disabled'] = 'disabled'
-                attribute = getattr(Contract.objects.get( id=contract_id), right)
+                attribute = getattr(Contract.objects.get(id=contract_id), right)
                 # TODO check if class is not FK then do any
                 dic['name'] = right
+
                 try:
                     dic['value'] = attribute.id
                 except:
-                    dic['value'] = attribute
+                    try:
+                        dic['value'] = attribute.isoformat()
+                    except:
+                        dic['value'] = attribute
                 cant_do_this.append(dic)
 
 
@@ -428,23 +442,24 @@ class ContractFabric(View):
             #     activity_form_flag = \
             #         Contract.objects.get(id=contract_id).activity_form.id
 
-            # economists disabled fields
-            if request.user.groups.filter(name='economists').exists():
-                contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-                contract_mode_flag = \
-                    Contract.objects.get(id=contract_id).contract_mode.id
-                contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
-                finance_cost_flag = \
-                    Contract.objects.get(id=contract_id).finance_cost.id
-
-            # spec asez disabled fields
-            if request.user.groups.filter(name='spec_ASEZ').exists():
-                contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
-                contract_mode_flag = \
-                    Contract.objects.get(id=contract_id).contract_mode.id
-                contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
-                activity_form_flag = \
-                    Contract.objects.get(id=contract_id).activity_form.id
+            #
+            # # economists disabled fields
+            # if request.user.groups.filter(name='economists').exists():
+            #     contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
+            #     contract_mode_flag = \
+            #         Contract.objects.get(id=contract_id).contract_mode.id
+            #     contract_form.fields['finance_cost'].widget.attrs['disabled'] = 'disabled'
+            #     finance_cost_flag = \
+            #         Contract.objects.get(id=contract_id).finance_cost.id
+            #
+            # # spec asez disabled fields
+            # if request.user.groups.filter(name='spec_ASEZ').exists():
+            #     contract_form.fields['contract_mode'].widget.attrs['disabled'] = 'disabled'
+            #     contract_mode_flag = \
+            #         Contract.objects.get(id=contract_id).contract_mode.id
+            #     contract_form.fields['activity_form'].widget.attrs['disabled'] = 'disabled'
+            #     activity_form_flag = \
+            #         Contract.objects.get(id=contract_id).activity_form.id
 
 
 
