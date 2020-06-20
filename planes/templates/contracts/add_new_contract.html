@@ -14,7 +14,7 @@
     {% csrf_token %}
     <table>
         {% for right in cant_do_this %}
-            <input name="{{ right.name }}" value="{{right.value}}" id="id_{{ right.name }}">
+            <input hidden name="{{ right.name }}" value="{{right.value}}" id="id_{{ right.name }}">
             {{ right }}<br>
         {% endfor %}
 
