@@ -93,7 +93,7 @@
     </select></p>
 
      <p><label for="report">Вариант отклонения</label>
-    <select id='report' name="select_report" size="1" class="form-control">
+    <select id='report' name="select_report" size="1" class="selectpicker form-control">
         {% for id, report in reports %}
         <option id="report_option" value={{id}} selected="selected">{{report}}</option>
         {% endfor %}

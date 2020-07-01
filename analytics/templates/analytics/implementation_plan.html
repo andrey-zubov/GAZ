@@ -8,10 +8,30 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
+<form>
+    <select id="mySelect" class="classSelect">
+        <option class="myOption">1</option>
+        <option class="myOption">2</option>
+        <option class="myOption">3</option>
+    </select>
+</form>
+
+
+
+
+
+<div id="main">
+
+
+
+
+
+<p>{{get}}</p>
+
 
 <div class="container-fluid" id="HTMLtoPDF">
   <h1 class="print output"> Исполнение плана по Минскому УМГ</h1>
-  <h4 class="print output">По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за год {{year}}</h4>
+  <h4 class="print output" id="reportName">По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за год {{year}}</h4>
 
   <div class="row">
     <div class="col-sm-5 print output ">
@@ -103,17 +123,17 @@
 
 
     </div>
-    <div class="col-sm-3 print output" >
-            <div class="chart-container" style="position: relative">
-    <canvas id="contractCountAll" width="250" height="250"></canvas>
+    <div class="col-sm-3 print output"  >
+            <div class="chart-container" style="overflow-x:auto;">
+    <canvas id="contractCountAll" style="overflow-x:auto;" ></canvas>
 </div>
 
-<div class="chart-container" style="position: relative">
-    <canvas id="contractCountSub" width="250" height="250"></canvas>
+<div class="chart-container" style="overflow-x:auto;">
+    <canvas id="contractCountSub" ></canvas>
 </div>
 
-<div class="chart-container" style="position: relative">
-    <canvas id="contractCountCentre" width="250" height="250"></canvas>
+<div class="chart-container" style="overflow-x:auto;">
+    <canvas id="contractCountCentre" ></canvas>
 </div>
     </div>
       <div class="col-sm-2" id="form" data-html2canvas-ignore="true">
@@ -182,6 +202,17 @@
     </div>
 </div>
 
+
+
+
+
+</div>
+
+
+
+
+
+
 <style>
     @media print{
     body{
@@ -223,7 +254,7 @@
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
 
 
-<script>
+<script id="scriptIDmyChart">
 var ctx = document.getElementById('myChart').getContext('2d');
 
 var planningData = {
@@ -327,7 +358,7 @@ var myChart = new Chart(ctx, {
 });
 </script>
 
-<script>
+<script id="scriptIDcontractCountAll">
 var ctx = document.getElementById('contractCountAll').getContext('2d');
 
 var countPlan = {
@@ -355,7 +386,7 @@ var countData = {
     };
 
 var chartOptions = {
-    responsive: false,
+    responsive: true,
     title:{
     display:true,
     text:'Все договоры'}
@@ -369,7 +400,7 @@ var myChart = new Chart(ctx, {
 });
 </script>
 
-<script>
+<script id="scriptIDcontractCountSub">
 var ctx = document.getElementById('contractCountSub').getContext('2d');
 
 var countPlan = {
@@ -397,7 +428,7 @@ var countData = {
     };
 
 var chartOptions = {
-    responsive: false,
+    responsive: true,
     title:{
     display:true,
     text:'Договоры филиала'}
@@ -411,7 +442,7 @@ var myChart = new Chart(ctx, {
 });
 </script>
 
-<script>
+<script id="scriptIDcontractCountCentre">
 var ctx = document.getElementById('contractCountCentre').getContext('2d');
 
 var countPlan = {
@@ -439,7 +470,7 @@ var countData = {
     };
 
 var chartOptions = {
-    responsive: false,
+    responsive: true,
     title:{
     display:true,
     text:'Централизованные договоры'}

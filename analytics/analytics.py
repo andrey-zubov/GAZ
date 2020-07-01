@@ -221,7 +221,8 @@ def get_analytics_for_all_contracts(request):
                       'contracts_count_fact': contracts_count_fact,
                       'year': year,
                       'finance_cost_title': finance_cost_title,
-                      'curator_title':curator_title
+                      'curator_title':curator_title,
+                      'get': request.GET
                       })
 
 def get_deviation_analysis(request):

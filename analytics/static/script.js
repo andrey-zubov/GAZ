@@ -11,6 +11,70 @@ $("document").ready(function(){
 )
 
 
+$("document").ready(function () {
+
+//alert(selectedOption.value);
+    console.log('I founf Jquert first');
+    $(".classSelect").change(function () {
+        let selectedOption = mySelect.options[mySelect.selectedIndex];
+        console.log("We found just mySelect!!!!", selectedOption.value);
+})
+})
+
+
+$("document").ready(function () {
+    $(".form-control").change(function() {
+        console.log("And we found form-control");
+        let selectYear = year.options[year.selectedIndex].value;
+        let selectFinanceCost = financeCost.options[financeCost.selectedIndex].value;
+        let selectCurator = curator.options[curator.selectedIndex].value;
+        let selectContractType = contractType.options[contractType.selectedIndex].value;
+        let selectContractStatus = contractStatus.options[contractStatus.selectedIndex].value;
+        console.log("Выбранный год", selectYear);
+        console.log("Выбранная статья финансирования", selectFinanceCost);
+        console.log("Выбранная куратор", selectCurator);
+
+        $.ajax({
+            'url':"/analytics/implementation_plan/",
+            "data": {
+                'select_year': selectYear,
+                'select_cost':selectFinanceCost,
+                'select_curator': selectCurator,
+//                'select_report': 1
+                'select_contractType': selectContractType,
+                'select_contractStatus': selectContractStatus
+
+            },
+            dataType:'html',
+            "success": function(data) {
+                $("#reportName").html($(data).find("#reportName"));
+                $("#table_id").html($(data).find("#table_id"));
+                $("#scriptIDmyChart").html($(data).find("#scriptIDmyChart"));
+                $("#scriptIDcontractCountAll").html($(data).find("#scriptIDcontractCountAll"));
+                $("#scriptIDcontractCountSub").html($(data).find("#scriptIDcontractCountSub"));
+                $("#scriptIDcontractCountCentre").html($(data).find("#scriptIDcontractCountCentre"));
+                $("#myChart").html($(data).find("#myChart"));
+                $("#contractCountAll").html($(data).find("#contractCountAll"));
+                $("#contractCountSub").html($(data).find("#contractCountSub"));
+                $("#contractCountCentre").html($(data).find("#contractCountCentre"));
+
+            }
+        })
+    })
+})
+
+
+$("#report").click(function () {
+    var my_options = $("#report option");
+
+    my_options.sort(function(a,b) {
+            return a.text.slice(0,2) - b.text.slice(0,2);
+        });
+    console.log("Hello from sort");
+    console.log(my_options);
+    $("#report").empty().append(my_options);
+});
+
 
 
 
