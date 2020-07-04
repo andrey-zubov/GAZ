@@ -4,42 +4,62 @@
 
 {% block content %}
 
+<div id="HTMLtoPDF" class="print output">
 <div class="headline">
     <h1>Отчет RDKZ</h1>
 </div>
 
 <div id="data-container">
-<table class="table-responsive" style="font-size:1vw; word-break:break-all;" border="1" >
+<table id="tableRDKZ" class="table table-responsive sort_col_table dragging sorted_table" style="font-size:1vw; word-break:break-all; font-size-adjust: 0.7;" border="1" >
 
     <tr>
         {% for i in len%}
-        <th>{{i}}</th>
+        <th style="word-wrap:break-word;font-size: 0.7vw; font-size-adjust: 0.7;" >{{i}}</th>
         {% endfor%}
     </tr>
-
+<thead class="sorted_head">
 <tr>
-            <th>№ п/п</th>
+            <th style="word-wrap:break-word;font-size: 0.7vw;">№ п/п</th>
         {% for head in final_fields%}
 
-            <th style="word-wrap:break-word;">{{head.0}}</th>
+            <th style="word-wrap:break-word;font-size: 0.7vw; font-size-adjust: 0.7;" class="placeholder dragged">{{head.0}}</th>
         {%endfor%}
 </tr>
+</thead>
+    <tbody>
     {% for contr in super_list%}
     <tr>
         {%for field in contr%}
-        <td>{{field}}</td>
+        <td style="font-size: 0.7vw;">{{field}}</td>
         {%endfor%}
     </tr>
     {%endfor%}
-
+    </tbody>
 
 </table>
 </div>
+</div>
+
 <div class="buttons-container">
             <button class="button" onclick="javascript:window.open('mailto:test@example.com')">Отправить</button>
             <button class="button" onclick="javascript:window.print()">Печать</button>
-            <button class="button" onclick="javascript:window.alert('В разработке')">Сохранить</button>
+    <div class="dropdown">
+            <button class="button dropbtn" onclick="myFunction()">Сохранить</button>
+                <div id="myDropdown" class="dropdown-content">
+                <a type="button" onclick="exportToExcel('tableRDKZ', 'RDKZ_analysis')">Excel</a>
+                <a type="button" onclick="generatePDF()">PDF</a>
+                </div>
+    </div>
             <button class="button" onclick="history.back()">Назад</button>
 </div>
-    
+
+<script src="{%static 'analytics/js/jquery.min.js'%}" ></script>
+<script src="{%static 'analytics/js/jquery-sortable.js'%}" ></script>
+
+<link rel="stylesheet" href="{%static 'analytics/css/analytics.css'%}">
+<script src="{%static 'analytics/js/scriptAnalytics.js'%}" ></script>
+<script src="{%static 'analytics/js/jspdf.min.js'%}" ></script>
+<script src="{%static 'analytics/js/html2canvas.js'%}"></script>
+<script src="{%static 'analytics/js/html2pdf.bundle.min.js'%}"></script>
+
 {% endblock content %}

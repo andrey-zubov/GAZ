@@ -1,0 +1,92 @@
+
+.dropbtn:hover, .dropbtn:focus {
+    background-color: #2980B9;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    min-width:10rem;
+    padding:.5rem 0;
+    margin:.125rem 0 0;
+    font-size:1rem;
+    color:#212529;
+    background-color:#fff;
+    background-clip:padding-box;
+    border:1px solid rgba(0,0,0,.15);
+    border-radius:.25rem
+
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}
+
+@media print{
+    body{
+    visibility:hidden;
+    }
+    .print{
+    visibility:visible;
+    }
+
+
+
+.sorted_table
+  tr
+    cursor: pointer
+  tr.placeholder
+    display: block
+    background: red
+    position: relative
+    margin: 0
+    padding: 0
+    border: none
+    &:before
+      content: ""
+      position: absolute
+      width: 0
+      height: 0
+      border: 5px solid transparent
+      border-left-color: $error
+      margin-top: -5px
+      left: -5px
+      border-right: none
+.sorted_head
+  th
+    cursor: pointer
+  th.placeholder
+    display: block
+    background: red
+    position: relative
+    width: 0
+    height: 0
+    margin: 0
+    padding: 0
+    &:before
+      content: ""
+      position: absolute
+      width: 0
+      height: 0
+      border: 5px solid transparent
+      border-top-color: $error
+      top: -6px
+      margin-left: -5px
+      border-bottom: none

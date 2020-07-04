@@ -18,8 +18,10 @@ from .models import (
     SumsBYN,
     Planning,
     Contract,
+    ContractRemarks,
     # PlanningYearFunding,
     # YearPeriod,
+
 )
 
 models = (
@@ -92,3 +94,8 @@ class PlanningAdmin(admin.ModelAdmin):
     )
     list_filter = ('FinanceCosts', 'curator', 'year')
 
+class ContractRemarksAdmin(admin.ModelAdmin):
+    list_display = ('contract',)
+    list_filter = ('contract',)
+
+admin.site.register(ContractRemarks, ContractRemarksAdmin)

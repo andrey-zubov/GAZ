@@ -4,19 +4,18 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-  <script src="{%static 'script.js'%}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-<div class="container-fluid" id="HTMLtoPDF">
+<div class="data-container" id="HTMLtoPDF">
   <h1 class="print output"> Анализ отклонений</h1>
-  <h4 class="print output">По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за {{year}} год</h4>
+  <h4 class="print output" id="deviationName">По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за {{year}} год</h4>
 
   <div class="row">
     <div class="col-sm-7 print output">
 
-          <table   class="table-responsive" style="font-size:1vw;" id="table_id">
+          <table   class="table-responsive" style="font-size:1vw;" id="tableDeviation">
 
     <tr>
         <th> Показатель </th>
@@ -63,37 +62,37 @@
 
 
 </table>
-                <div class="chart-container print output" style="position: relative">
+                <div class="chart-container print output" style="position: relative; font-size:1vw;">
 
-<canvas id="myChart" ></canvas></div>
+<canvas id="deviationChart" ></canvas></div>
 
     </div>
 
       <div class="col-sm-4" data-html2canvas-ignore="true">
                   <form action="{% url 'analytics:deviation_analysis'  %}" method="get" name="filter" class="form-group">
     <p><label for="year">Отчетный год </label>
-        <select id="year" size="1" name="select_year" class="form-control" >
+        <select id="year" size="1" name="select_year" class="form-control form-deviation" >
         {% for year in years %}
             <option id="year_option" selected="selected"> {{year}} </option>
         {% endfor %}
         </select></p>
 
     <p><label for="financeCost">Статья финансирования </label>
-        <select id="financeCost" name="select_cost" size="1" class="form-control">
+        <select id="financeCost" name="select_cost" size="1" class="form-control form-deviation">
         {% for cost in FinanceCosts %}
         <option id="cost_option" value={{cost.id}} selected="selected">{{cost.title}}</option>
         {% endfor %}
         </select></p>
 
     <p><label for="curator">Куратор </label>
-    <select id='curator' name="select_curator" size="1" class="form-control">
+    <select id='curator' name="select_curator" size="1" class="form-control form-deviation">
         {% for curator in curators %}
         <option id="curator_option" value={{curator.id}} selected="selected">{{curator.title}}</option>
         {% endfor %}
     </select></p>
 
      <p><label for="report">Вариант отклонения</label>
-    <select id='report' name="select_report" size="1" class="selectpicker form-control">
+    <select id='report' name="select_report" size="1" class="form-control form-deviation">
         {% for id, report in reports %}
         <option id="report_option" value={{id}} selected="selected">{{report}}</option>
         {% endfor %}
@@ -108,75 +107,33 @@
 
 
 
-    <div class="row" data-html2canvas-ignore="true">
-        <div class="col-sm-6" ></div>
-        <div class="col-sm-6">
-            <button type="button" onclick="javascript:window.print()" class="btn btn-primary">Печать</button>
-            <button type="button" onclick="javascript:window.open('mailto:test@example.com');" class="btn btn-primary">Отправить</button>
-
-            <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-       Сохранить
-    </button>
-    <div class="dropdown-menu">
-      <a class="dropdown-item" type="button" onclick="exportToExcel('table_id', 'user-data')">Excel</a>
-      <a class="dropdown-item" type="button" onclick="generatePDF()">PDF</a>
+<div class="buttons-container">
+            <button class="button" onclick="javascript:window.open('mailto:test@example.com')">Отправить</button>
+            <button class="button" onclick="javascript:window.print()">Печать</button>
+    <div class="dropdown">
+            <button class="button dropbtn" onclick="myFunction()">Сохранить</button>
+                <div id="myDropdown" class="dropdown-content">
+                <a type="button" onclick="exportToExcel('tableDeviation', 'Deviation_analysis')">Excel</a>
+                <a type="button" onclick="generatePDF()">PDF</a>
+                </div>
     </div>
-  </div>
-                <a type="button" class="btn btn-primary active" href="{% url 'analytics:analytics' %}">
-                Назад</a>
-        </div>
-    </div>
+            <button class="button" onclick="history.back()">Назад</button>
 </div>
 
-<style>
-    @media print{
-    body{
-    visibility:hidden;
-    }
-    .print{
-    visibility:visible;
-    }
-</style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-  <script src={%static "script.js"%} ></script>
-
-
-  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
-  <script src={%static "html2canvas.js"%} ></script>
-
-    <script src={%static "html2pdf.bundle.min.js"%} ></script>
-
-    <script>
-      function generatePDF() {
-        // Choose the element that our invoice is rendered in.
-        const element = document.getElementById("HTMLtoPDF");
-        const form = document.getElementById("form")
-        const opt = {
-        html2canvas: {scale:2, ignoreElements:form},
-        jsPDF: {unit:'mm', format:'a4', orientation: 'l'}};
-        // Choose the element and save the PDF for our user.
-        html2pdf()
-          .set(opt)
-          .from(element)
-          .save();
-      }
-    </script>
-
-
-
-
-
-
-
-
+<script src="{%static 'analytics/js/jquery.min.js'%}" ></script>
+<script src="{%static 'analytics/js/jquery-sortable.js'%}" ></script>
+<link rel="stylesheet" href="{%static 'analytics/css/analytics.css'%}">
+<script src="{%static 'analytics/js/scriptAnalytics.js'%}" ></script>
+<script src="{%static 'analytics/js/jspdf.min.js'%}" ></script>
+<script src="{%static 'analytics/js/html2canvas.js'%}"></script>
+<script src="{%static 'analytics/js/html2pdf.bundle.min.js'%}"></script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 
-<script>
-var ctx = document.getElementById('myChart').getContext('2d');
+<script id="deviationChartScript">
+var ctx = document.getElementById('deviationChart').getContext('2d');
 
 var reducedData = {
     label: "{{difference.red_title}}",

@@ -8,27 +8,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-<form>
-    <select id="mySelect" class="classSelect">
-        <option class="myOption">1</option>
-        <option class="myOption">2</option>
-        <option class="myOption">3</option>
-    </select>
-</form>
-
-
-
-
-
-<div id="main">
-
-
-
-
-
-<p>{{get}}</p>
-
-
 <div class="container-fluid" id="HTMLtoPDF">
   <h1 class="print output"> Исполнение плана по Минскому УМГ</h1>
   <h4 class="print output" id="reportName">По статье финансирования {{finance_cost_title}}, по куратору {{curator_title}} за год {{year}}</h4>
@@ -39,7 +18,7 @@
 
 <canvas id="myChart" ></canvas></div>
 
-<table   class="table-responsive " style="font-size:1vw;" id="table_id">
+<table   class="table-responsive " style="font-size:0.9vw; " id="table_id">
 
     <tr>
         <th> Показатель </th>
@@ -136,31 +115,35 @@
     <canvas id="contractCountCentre" ></canvas>
 </div>
     </div>
+
+
       <div class="col-sm-2" id="form" data-html2canvas-ignore="true">
                   <form action="{% url 'analytics:implementation_plan'  %}" method="get" name="filter" class="form-group">
     <p><label for="year">Отчетный год </label>
-        <select id="year" size="1" name="select_year" class="form-control" >
+        <select id="year" size="1" name="select_year" class="form-control form-implementation" >
         {% for year in years %}
             <option id="year_option" selected="selected" class="year-selector" > {{year}} </option>
         {% endfor %}
         </select></p>
 
     <p><label for="financeCost">Статья финансирования </label>
-        <select id="financeCost" name="select_cost" size="1" class="form-control">
+        <select id="financeCost" name="select_cost" size="1" class="form-control form-implementation">
         {% for cost in FinanceCosts %}
         <option id="cost_option" value={{cost.id}} selected="selected">{{cost.title}}</option>
         {% endfor %}
+        <option value="0">Все</option>
         </select></p>
 
     <p><label for="curator">Куратор </label>
-    <select id='curator' name="select_curator" size="1" class="form-control">
+    <select id='curator' name="select_curator" size="1" class="form-control form-implementation">
         {% for curator in curators %}
         <option id="curator_option" value={{curator.id}} selected="selected">{{curator.title}}</option>
         {% endfor %}
+        <option value="0">Все</option>
     </select></p>
 
     <p><label for="contractType">Тип договора </label>
-    <select id='contractType' name="select_contractType" size="1" class="form-control">
+    <select id='contractType' name="select_contractType" size="1" class="form-control form-implementation">
         {% for type in contract_types %}
         <option id="contractType_option" value={{type.id}} selected="selected">{{type.title}}</option>
         {% endfor %}
@@ -168,7 +151,7 @@
     </select></p>
 
     <p><label for="contractStatus">Статус договора </label>
-    <select id='contractStatus' name="select_contractStatus" size="1" class="form-control">
+    <select id='contractStatus' name="select_contractStatus" size="1" class="form-control form-implementation">
         {% for status in contract_status %}
         <option id="contractStatus_option" value={{status.id}} selected="selected">{{status.title}}</option>
         {% endfor %}
@@ -181,77 +164,30 @@
       </div>
   </div>
 
-    <div class="row" data-html2canvas-ignore="true">
-        <div class="col-sm-6" ></div>
-        <div class="col-sm-6">
-            <button type="button" onclick="javascript:window.print()" class="btn btn-primary">Печать</button>
-            <button type="button" onclick="javascript:window.open('mailto:test@example.com');" class="btn btn-primary">Отправить</button>
-
-            <div class="btn-group">
-    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-       Сохранить
-    </button>
-    <div class="dropdown-menu">
-      <a class="dropdown-item" type="button" onclick="exportToExcel('table_id', 'user-data')">Excel</a>
-      <a class="dropdown-item" type="button" onclick="generatePDF()">PDF</a>
+<div class="buttons-container">
+            <button class="button" onclick="javascript:window.open('mailto:test@example.com')">Отправить</button>
+            <button class="button" onclick="javascript:window.print()">Печать</button>
+    <div class="dropdown">
+            <button class="button dropbtn" onclick="myFunction()">Сохранить</button>
+                <div id="myDropdown" class="dropdown-content">
+                <a type="button" onclick="exportToExcel('table_id', 'implementation_analysis')">Excel</a>
+                <a type="button" onclick="generatePDF()">PDF</a>
+                </div>
     </div>
-  </div>
-                <a type="button" class="btn btn-primary active" href="{% url 'analytics:analytics' %}">
-                Назад</a>
-        </div>
-    </div>
+            <button class="button" onclick="history.back()">Назад</button>
 </div>
 
+<script src="{%static 'analytics/js/jquery.min.js'%}" ></script>
+<script src="{%static 'analytics/js/jquery-sortable.js'%}" ></script>
+<link rel="stylesheet" href="{%static 'analytics/css/analytics.css'%}">
+<script src="{%static 'analytics/js/scriptAnalytics.js'%}" ></script>
+<script src="{%static 'analytics/js/jspdf.min.js'%}" ></script>
+<script src="{%static 'analytics/js/html2canvas.js'%}"></script>
+<script src="{%static 'analytics/js/html2pdf.bundle.min.js'%}"></script>
 
-
-
-
-</div>
-
-
-
-
-
-
-<style>
-    @media print{
-    body{
-    visibility:hidden;
-    }
-    .print{
-    visibility:visible;
-    }
-</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-  <script src={%static "script.js"%} ></script>
-
-
-  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
-  <script src={%static "html2canvas.js"%} ></script>
-
-    <script src={%static "html2pdf.bundle.min.js"%} ></script>
-
-    <script>
-      function generatePDF() {
-        // Choose the element that our invoice is rendered in.
-        const element = document.getElementById("HTMLtoPDF");
-        const form = document.getElementById("form")
-        const opt = {
-        html2canvas: {scale:2, ignoreElements:form},
-        jsPDF: {unit:'mm', format:'a4', orientation: 'l'}};
-        // Choose the element and save the PDF for our user.
-        html2pdf()
-          .set(opt)
-          .from(element)
-          .save();
-      }
-    </script>
-
-
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" >
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+<!--<script src={%static 'analytics/js/Chart.bundle.min.js'%} ></script>-->
 
 
 <script id="scriptIDmyChart">
