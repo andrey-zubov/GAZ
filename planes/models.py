@@ -445,7 +445,7 @@ class SumsRUR(models.Model):  # TODO is that only in RUR or in eny foregin curre
         blank=True,
         decimal_places=2,
         max_digits=12,
-        default_currency=('RUR', 'RUB')
+        #default_currency=('RUR', 'RUB')
     )
     currency_rate_on_load_date_ASEZ_NDS = MoneyField(
         verbose_name="Курс валюты на дату загрузки в бел.руб.",
@@ -453,7 +453,7 @@ class SumsRUR(models.Model):  # TODO is that only in RUR or in eny foregin curre
         blank=True,
         decimal_places=5,
         max_digits=12,
-        default_currency=('RUR', 'RUB')
+        #default_currency=('RUR', 'RUB')
     )
     contract_sum_NDS_RUB = MoneyField(
         verbose_name="Сумма договора с НДС рос.руб.",
@@ -461,7 +461,7 @@ class SumsRUR(models.Model):  # TODO is that only in RUR or in eny foregin curre
         null=True,
         decimal_places=2,
         max_digits=12,
-        default_currency=('RUR', 'RUB')
+       # default_currency=('RUR', 'RUB')
     )
     currency = models.ForeignKey(  # TODO what to do with this
         Currency,
@@ -476,7 +476,7 @@ class SumsRUR(models.Model):  # TODO is that only in RUR or in eny foregin curre
         null=True,
         decimal_places=2,
         max_digits=12,
-        default_currency=('RUR', 'RUB')
+        #default_currency=('RUR', 'RUB')
     )
 
     def __str__(self):
@@ -502,7 +502,7 @@ class SumsBYN(models.Model):
         verbose_name = 'Показатели договора в белорусских рублях'
         verbose_name_plural = 'Показатели договора в белорусских рублях'
 
-    # unique_together = [['contract', 'year', 'period']]
+    unique_together = [['contract', 'year', 'period']]
 
     YEARS = [
         ("2018", "2018"),

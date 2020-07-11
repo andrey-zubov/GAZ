@@ -5,16 +5,13 @@ from .forms import (
     LoginForm,
     RegisterForm,
     ContractForm,
-    SumsBYNForm,
     SumsRURForm,
     PlanningForm,
     YearForm,
-    SumsBYNForm_economist,
-    SumsBYNForm_lawyer,
-    SumsBYNForm_asez,
     SumsBYNForm_months,
     SumsBYNForm_quarts,
     SumsBYNForm_year,
+    UploadFileForm,
 )
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
@@ -37,12 +34,17 @@ from .models import (
     StateASEZ,
     NumberPZTRU,
     ContractStatus,
-    Counterpart
+    Counterpart,
+    ActivityForm,
 )
 from django.urls import reverse
 import json
 from django.forms import formset_factory, modelformset_factory
 from django.db.models import Q
+import math
+from decimal import *
+import pandas as pd
+import numpy as np
 
 
 @login_required
@@ -243,81 +245,6 @@ class DeletedContracts(View):
         return contract_to_recover
 
 
-def test(request):
-    months = [
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-    ]
-
-    contract = Contract.objects.latest('id')
-    sum_b = SumsBYN.objects.filter(contract=contract)
-    contract_form = ContractForm(instance=contract)
-    SumBYNFormSet = modelformset_factory(SumsBYN, SumsBYNForm, extra=1)  # Берет ИЗ БД
-
-    formset = SumBYNFormSet(queryset=SumsBYN.objects.all(),
-                            initial=[])
-    for form in formset:
-        # form.fields['period'].widget.attrs['hidden'] = True
-        # form.fields['period'].label = 'rewqrqre'
-        if form['period'].value() in months:
-            form.fields['period'].label = 'qq'  # TODO this line dont work in IF but works alone. waaaat
-            form.fields['plan_sum_SAP'].widget.attrs['hidden'] = True
-            form.fields['contract_sum_without_NDS_BYN'].widget.attrs['hidden'] = True
-            form.fields['economy_total'].widget.attrs['hidden'] = True
-            form.fields['economy_total'].label = ''
-            form.fields['contract_sum_without_NDS_BYN'].label = ''
-            form.fields['plan_sum_SAP'].label = ''
-
-    if request.user.groups.filter(name='spec_ASEZ'):
-        return HttpResponse('spec_ASEZ')
-
-    return render(request, template_name='contracts/test.html', context={'contract':contract,
-                                                                         'sum_b':sum_b,
-                                                                         'contract_form':contract_form,
-                                                                         'formset':formset})
-
-
-def double_formset(request):
-    months = [
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "may",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "oct",
-        "nov",
-        "dec",
-    ]
-    quarts = [
-        "1quart",
-        "2quart",
-        "3quart",
-        "4quart",
-    ]
-
-    form_fac_1 = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)
-    formset_1 = form_fac_1(queryset=SumsBYN.objects.filter(period__in=months), prefix='test_1')
-    form_fac_2 = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
-    formset_2 = form_fac_2(queryset=SumsBYN.objects.filter(period__in=quarts), prefix='test_2')
-
-    return render(request, template_name='contracts/double_test.html', context={'formset_1':formset_1,
-                                                                                'formset_2':formset_2})
-
-
 class ContractFabric(View):
     ''' allow to create, change, copy and delete (move to deleted) contracts '''
     create_or_add = 'contracts/add_new_contract.html'
@@ -352,6 +279,11 @@ class ContractFabric(View):
         if request.GET.__contains__('pattern_contract_id'):
             contract_id = int(request.GET['pattern_contract_id'])
 
+        contract_mode_flag = False
+        finance_cost_flag = False
+        activity_form_flag = False
+        cant_do_this = []
+
         if not contract_id:
             ''' Create new contract with initial sumBYN and sumRUR'''
             contract_form = ContractForm
@@ -373,7 +305,6 @@ class ContractFabric(View):
                 pass
 
         else:
-            user_groups = request.user.groups
             SumBYNFormSet_months = modelformset_factory(SumsBYN, SumsBYNForm_months, extra=0)  # Берет ИЗ БД
             SumBYNFormSet_quarts = modelformset_factory(SumsBYN, SumsBYNForm_quarts, extra=0)
 
@@ -394,15 +325,92 @@ class ContractFabric(View):
             contract_form = ContractForm(instance=get_object_or_404(Contract, id=contract_id))
             sum_rur_form = SumsRURForm(instance=get_object_or_404(SumsRUR, contract__id=contract_id))
 
-        # if request.user.groups.filter(name='lawyers').exists():  # if in group - get permission for fields
-        #     for form in formset_months:
-        #         form.fields['forecast_total'].widget.attrs['contenteditable'] = False
-        # else:
-        #     return HttpResponse('not laweyr')
+            ''' readonly field for everyone '''
+            sum_byn_year_form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+
+            contract_mode_flag = False
+            finance_cost_flag = False
+            activity_form_flag = False
+
+            block_list = [getattr(i, 'name') for i in Contract._meta.fields]
+
+            user_groups = request.user.groups.all()
+            user_rights = {}
+            user_rights['lawyers'] = [
+                'id',  # id need course you can create new or etc
+                'contract_mode',
+                'number_ppz',
+                'contract_status',
+                'register_number_SAP',
+                'contract_number',
+                'fact_sign_date',
+                'start_date',
+                'end_time',
+                'counterpart',
+                'related_contract'
+            ]
+            user_rights['economists'] = [
+                'id',
+                'finance_cost',
+                'activity_form',
+            ]
+            user_rights['spec_ASEZ'] = [
+                'id',
+                'purchase_type',
+                'number_ppz',
+                'number_PZTRU',
+                'stateASEZ',
+                'plan_load_date_ASEZ',
+                'fact_load_date_ASEZ',
+                'currency',
+                'number_KGG',
+            ]
+
+            this_user_in_groups = [i.name for i in user_groups]
+            this_user_can_do = []
+            for i in this_user_in_groups:
+
+                this_user_can_do.extend(user_rights[i])
+
+            this_user_can_do = set(this_user_can_do)
+
+            this_user_cant_do = [i for i in block_list if i not in this_user_can_do]
+            if 'id' in this_user_cant_do:
+                this_user_cant_do.remove('id')
+
+            for right in this_user_cant_do:
+                dic = {}
+                contract_form.fields[right].widget.attrs['disabled'] = 'disabled'
+                attribute = getattr(Contract.objects.get(id=contract_id), right)
+                dic['name'] = right
+                if attribute == None:
+                    attribute = ''
+                try:
+                    dic['value'] = attribute.id
+                except:
+                    try:
+                        dic['value'] = attribute.isoformat()
+                    except:
+                        dic['value'] = attribute
+                cant_do_this.append(dic)
+
+            if not request.user.groups.filter(name='economists').exists():
+                for form in formset_quarts:  # make fields readonly
+                    form.fields['plan_sum_SAP'].widget.attrs['readonly'] = 'readonly'
+                    form.fields['contract_sum_without_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
+                for form in formset_months:  # make fields readonly
+                    form.fields['forecast_total'].widget.attrs['readonly'] = 'readonly'
+                    form.fields['fact_total'].widget.attrs['readonly'] = 'readonly'
+                sum_byn_year_form.fields['contract_sum_with_NDS_BYN'].widget.attrs['readonly'] = 'readonly'
 
         return render(request,
                       template_name=self.create_or_add,
                       context={
+                          'contract_mode_flag':contract_mode_flag,
+                          'finance_cost_flag':finance_cost_flag,
+                          'activity_form_flag':activity_form_flag,
+                          'cant_do_this':cant_do_this,
+
                           'formset_months':formset_months,
                           'formset_quarts':formset_quarts,
                           'sum_byn_year_form': sum_byn_year_form,
@@ -436,7 +444,6 @@ class ContractFabric(View):
         formset_months = SumBYNFormSet_months(request.POST, prefix='months')
         formset_quarts = SumBYNFormSet_quarts(request.POST, prefix='quarts')
 
-
         if sum_rur_form.is_valid() \
                 and contract_form.is_valid() \
                 and sum_byn_year_form.is_valid() \
@@ -444,28 +451,40 @@ class ContractFabric(View):
                 and formset_quarts.is_valid():
 
             new_contract = contract_form.save()
+            new_sum_rur = sum_rur_form.save(commit=False)
+            new_sum_rur.contract = new_contract
+            new_sum_rur.save()
             new_sum_byn_year = sum_byn_year_form.save(commit=False)
             new_sum_byn_year.contract = new_contract
+            new_sum_byn_year.year = new_sum_rur.year
             new_sum_byn_year.save()
             for form in formset_months:
                 new_sum_byn = form.save(commit=False)
                 new_sum_byn.contract = new_contract
+                new_sum_byn.year = new_sum_rur.year
                 new_sum_byn.save()
             for form in formset_quarts:
                 new_sum_byn = form.save(commit=False)
                 new_sum_byn.contract = new_contract
+                new_sum_byn.year = new_sum_rur.year
                 new_sum_byn.save()
             if create_periods_flag:
                 for p in self.periods:
-                    new_sum_byn = SumsBYN.objects.create(period=p, contract=new_contract)
-            new_sum_rur = sum_rur_form.save(commit=False)
-            new_sum_rur.contract = new_contract
-            new_sum_rur.save()
+                    new_sum_byn = SumsBYN.objects.create(
+                        period=p,
+                        contract=new_contract,
+                        year=new_sum_rur.year
+                    )
             return redirect(reverse('planes:contracts'))
         else:
-            print(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
-            return HttpResponse(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
+            print( sum_rur_form.is_valid(),
+                   contract_form.is_valid(),
+                   sum_byn_year_form.is_valid(),
+                   formset_months.is_valid(),
+                   formset_quarts.is_valid())
 
+            return HttpResponse(sum_byn_year_form.errors, formset_quarts.errors, formset_months.errors)
+            # TODO
 
 def adding_click_to_UserActivityJournal(request):
      counter = UserActivityJournal.objects.get(user=request.user)
@@ -609,3 +628,140 @@ def add(request, finance_cost_id, year):
 
             # return reverse('planes', kwargs={'year': year})
     return render(request, './planes/add.html', response)
+
+
+class parse_excel(View):
+    periods = {
+        "jan": 'Янв',
+        "feb": 'Фев',
+        "mar": 'Март',
+        "apr": 'Апр',
+        "may": 'Май',
+        "jun": 'Июнь',
+        "jul": 'Июль',
+        "aug": 'Авг',
+        "sep": 'Сент',
+        "oct": 'Окт',
+        "nov": 'Нояб',
+        "dec": 'Дек',
+    }
+
+    quarts = {
+        "1quart": ' I кв.',
+        "2quart": 'II кв.',
+        "3quart": ' III кв.',
+        "4quart": ' IV кв.',
+    }
+
+    def get(self, request):
+        form = UploadFileForm()
+        excel_data = None
+        return render(request,
+                      template_name='contracts/panda.html',
+                      context={
+                          'data1': excel_data,
+                          'form': form
+                      })
+
+    def post(self, request):
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            for chunk in request.FILES['file'].chunks():  # works with last file
+                excel_data = self.find_excel(chunk)
+                # excel_data = pd.read_excel(chunk, sheet_name='Лист2')  # TODO Open excel
+        to_drop = [i for i in excel_data.columns if 'Unnamed' in i]
+        test = excel_data.drop(columns=[i for i in to_drop])
+        dic = test.to_dict(orient='records')
+        for line in dic:
+            new_contract = Contract.objects.create(
+                title=line['Наименование (предмет) договора, доп соглашения к договору'],
+                finance_cost=self.fk_model(line,
+                                      model=FinanceCosts,
+                                      value='Статья финансирования'),
+                curator=self.fk_model(line,
+                                 model=Curator,
+                                 value='Куратор'),
+                stateASEZ=self.fk_model(line,
+                                   model=StateASEZ,
+                                   value='Состояние АСЭЗ'),
+                plan_load_date_ASEZ=date.today().isoformat(),  # TODO what is it?
+                plan_sign_date=date.today().isoformat(),  # TODO what is it?
+                start_date=line['Дата заключения'].to_pydatetime(),
+                activity_form=self.fk_model(line,
+                                       model=ActivityForm,
+                                       value='Виды деятельности'),
+                contract_mode_id=1,  # Основной
+                contract_type=self.fk_model(line,
+                                       model=ContractType,
+                                       value='Центр/филиал'.split('.')[0]),
+                counterpart=self.fk_model(line,
+                                     model=Counterpart,
+                                     value='Контрагент по договору'),
+                purchase_type=self.fk_model(line,
+                                       model=PurchaseType,
+                                       value='Тип закупки\n(конкурентная/\nнеконкурентная ЕП)'),
+                number_ppz=line['№ ППЗ АСЭЗ'],
+                number_KGG=line['Номер договора']
+            )
+
+            new_sum_rur = SumsRUR.objects.create(
+                contract=new_contract,
+                year='2020',  # TODO parse it from excel
+                start_max_price_ASEZ_NDS=None,  # TODO where is info?
+            )
+            for p in self.periods:
+                month = self.periods[p]
+                forecast_month = line['Прогноз {0}'.format(month)]
+                try:
+                    fact = line['Факт {0}'.format(month)]
+                except:
+                    fact = line['Факт {0}.'.format(month)]
+                if math.isnan(forecast_month):
+                    forecast_month = 0
+                if math.isnan(fact):
+                    fact = 0
+
+                new_sum_byn = SumsBYN.objects.create(
+                    period=p,
+                    contract=new_contract,
+                    year=new_sum_rur.year,
+                    forecast_total=Decimal(forecast_month),
+                    fact_total=Decimal(fact),
+                )
+            for q in self.quarts:
+                quart = self.quarts[q]
+                forecast_quart = line['Плановая сумма SAP {0}'.format(quart)]
+                if math.isnan(forecast_quart):
+                    forecast_quart = 0
+                elif forecast_quart is str:
+                    forecast_quart = forecast_quart.replace(',', '.')
+                quart_sum_byn = SumsBYN.objects.get(
+                    contract=new_contract,
+                    period=q,
+                    year=new_sum_rur.year
+                )
+                quart_sum_byn.plan_sum_SAP = Decimal(forecast_quart)
+                quart_sum_byn.save()
+
+        return redirect(reverse('planes:contracts'))
+
+    @staticmethod
+    def find_excel(chunk):
+        sheet_list = [
+            'Лист1',
+            'Лист2',
+            'Лист3',
+        ]
+        for page in sheet_list:
+            excel_data = pd.read_excel(chunk, sheet_name=page, skiprows=2)
+            if excel_data.shape != (0, 0):
+                return excel_data
+
+
+    @staticmethod
+    def fk_model(line, model, value):
+        try:
+            res = model.objects.get(title=value)
+        except:  # TODO filler ny it
+            res = model.objects.get(id=1)
+        return res

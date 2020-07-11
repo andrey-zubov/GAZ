@@ -9,6 +9,7 @@ urlpatterns = [
     path('schema/', Schema.as_view()),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
+    path('', include('planes.urls', namespace='planes')),
     path('plane/', include('planes.urls', namespace='planes')),
     path('catalog/', include('catalog.urls', namespace='catalog')),
     path('analytics/', include('analytics.urls', namespace='analytics')),

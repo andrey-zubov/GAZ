@@ -1,17 +1,20 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
 </head>
 <body>
+    <form method="POST" action="{% url 'planes:register' %}">
+        {% csrf_token %}
+        <p>имя пользователя:{{ form }}</p>
 
-<form method="POST" action="{% url 'planes:register' %}">
-{% csrf_token %}
-<p>имя пользователя:{{ form }}</p>
-
-
-<input name="register" type="submit" value="Зарегистрировать">
-</form>
+        <input name="register" type="submit" value="Зарегистрировать">
+    </form>
 </body>
 </html>

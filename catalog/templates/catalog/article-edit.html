@@ -1,0 +1,96 @@
+{% extends 'base.html'%}
+
+{% load static %}
+
+{% block content %}
+
+    <div class="headline">
+        <h1>Справочник "{{ title }}"</h1>
+    <p style="color: red">(примечание: не реализованы права доступа к редактированию)</p>
+    </div>
+
+{#    <section id="directories-list">#}
+{#    <div class="list-container">#}
+
+    <div id="data-container" class="catalog-container">
+
+        <form method="POST" id="form1">
+        {% csrf_token %}
+            <table>
+                {{ formset.management_form }}
+
+                {% for form in formset.forms %}
+                  {% if forloop.first %}
+                  <thead>
+                      <tr>
+                        {% for field in form.visible_fields %}
+                            <th>{{ field.label|capfirst }}</th>
+                        {% endfor %}
+{#                        <th>Edit</th>#}
+{#                        <th>Delete</th>#}
+                      </tr>
+                  </thead>
+                  {% endif %}
+
+                  <tr>
+                  {% for field in form.visible_fields %}
+                    <td>
+                    {# Include the hidden fields in the form #}
+                        {% if forloop.first %}
+                          {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                          {% endfor %}
+                        {% endif %}
+
+                        {{ field.errors.as_ul }}
+                        {{ field }}
+                    </td>
+                  {% endfor %}
+
+{#                    <td id="td-edit-mode" style="border: none; padding-left: 8px">#}
+{#                        <a href=""><button>Edit</button></a>#}
+{#                    </td>#}
+{#                    <td id="td-edit-mode" style="border: none; padding-left: 8px">#}
+{#                        <a href=""><button>Delete</button></a>#}
+{#                    </td>#}
+
+                  </tr>
+
+                {% endfor %}
+
+            </table>
+        </form>
+
+    </div>
+{#    </section>#}
+{#--------------------------------------------------------------------#}
+{#    <div id="data-container">#}
+{#        <table>#}
+{#            <thead>#}
+{#                <tr>#}
+{#                    <th>{{ v_name|capfirst }}</th>#}
+{#                </tr>#}
+{#            </thead>#}
+{##}
+{#            {% for name in queryset %}#}
+{#                <tr>#}
+{#                    <td>{{ name }}</td>#}
+{#                </tr>#}
+{#            {% endfor %}#}
+{##}
+{#        </table>#}
+{#    </div>#}
+
+    <div class="buttons-container">
+{#        <input type="submit" value="Save">#}
+{#        <button type="submit" form="form1" value="Submit">Submit</button>#}
+{#        <button type="submit" form="form1" value="Submit" id="btn-edit-mode-show" class="button" onclick="saveEditions()">#}
+        <button type="submit" form="form1" value="Submit" class="button">
+            Сохранить
+        </button>
+{#        <button id="btn-edit-mode-show" class="button" onclick="saveEditions()">Сохранить</button>#}
+{#        <button id="btn-edit-mode-hide" class="button" onclick="enableEditMode()">Редактировать</button>#}
+        <button class="button" onclick="cancelEditMode()">Назад</button>
+    </div>
+
+{% endblock content %}

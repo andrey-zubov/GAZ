@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="headline">
+    <h1>Отчет RDKZ</h1>
+</div>
+
+<div id="data-container">
+<table class="table-responsive" style="font-size:1vw; word-break:break-all;" border="1" >
+
+    <tr>
+        {% for i in len%}
+        <th>{{i}}</th>
+        {% endfor%}
+    </tr>
+
+<tr>
+            <th>№ п/п</th>
+        {% for head in final_fields%}
+
+            <th style="word-wrap:break-word;">{{head.0}}</th>
+        {%endfor%}
+</tr>
+    {% for contr in super_list%}
+    <tr>
+        {%for field in contr%}
+        <td>{{field}}</td>
+        {%endfor%}
+    </tr>
+    {%endfor%}
+
+
+</table>
+</div>
+<div class="buttons-container">
+            <button class="button" onclick="javascript:window.open('mailto:test@example.com')">Отправить</button>
+            <button class="button" onclick="javascript:window.print()">Печать</button>
+            <button class="button" onclick="javascript:window.alert('В разработке')">Сохранить</button>
+            <button class="button" onclick="history.back()">Назад</button>
+</div>
+    
+{% endblock content %}
