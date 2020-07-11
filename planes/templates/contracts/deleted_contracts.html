@@ -1,17 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content%}
+<style>
+   h1 {
+    text-align: center;
+   }
+   p {
+   padding-left: 20px;
+   }
+  </style>
+<h1>Удаленные договоры</h1>
 <form>
     <p><input type="search" name="search" placeholder="Поиск договора">
+
         <input type="submit" value="Найти"></p>
 </form>
 {% for contract in contracts %}
-  
-<a href="{% url 'planes:recover_contract' contract.id %}"> {{ contract }}</a><br>
+
+<p><input type="checkbox">
+    <a href="{% url 'planes:recover_contract' contract.id %}"> Договор : {{ contract.title }}</a>
+</p>
 
 {% endfor %}
-</body>
+
+<br>
+<div class="fixedbut">Восстановить договор</div>
+
+<style>
+.fixedbut { position: fixed;
+ bottom: 20px; right: 20px;
+ display: block;
+ background: #007ac2;
+ color: #fff;
+ text-decoration: none;
+ padding: 6px 23px;
+ font-size: 25px;}
+
+.fixedbut:hover { background: #222; }
+</style>
+
+{% endblock content %}
