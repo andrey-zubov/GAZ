@@ -1,4 +1,6 @@
+{% extends "base.html" %}
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +8,11 @@
     <title>Title</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{% static '/planes/js/script_form_year.js' %}"></script>
+
 </head>
 <body>
 
-
+{% block content %}
 <form action="" method="post">
     {% csrf_token %}
     <table>
@@ -31,7 +34,7 @@
             {{ form }}
         {% endfor %}
     </table>
-    <hr><hr>
+    <hr><hr><hr>
 
     {{ formset_quarts.management_form }}
     <table>
@@ -48,6 +51,6 @@
     <button type="submit">ОК</button>
 </form>
 
-
 </body>
 </html>
+{% endblock %}
