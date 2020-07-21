@@ -11,7 +11,8 @@ from .views import (
     plane,
     ContractFabric,
     DeletedContracts,
-    parse_excel
+    parse_excel,
+    deleted_contract_render,
 )
 
 app_name = "planes"
@@ -42,12 +43,12 @@ urlpatterns = [
             ),
          name='copy_contract'
          ),
-    path('contracts/deleted_contracts/',
-        login_required(
-        permission_required('planes:add_contract')(DeletedContracts.as_view())
-            ),
-        name='deleted_contracts'
-         ),
+    path('contracts/deleted_contracts/', deleted_contract_render),
+        # login_required(
+        # permission_required('planes:add_contract')(DeletedContracts.as_view())
+        #     ),
+        # name='deleted_contracts'
+        #  ),
     path('add_click/', adding_click_to_UserActivityJournal, name='add_click'),
     path('<int:year>/<int:finance_cost_id>/curators/', curators, name='curators'),
     path('to_server/', from_js, name='from_js'),

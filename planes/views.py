@@ -221,6 +221,12 @@ class ContractView(View):
             )
         return contract_and_sum
 
+def deleted_contract_render(request):
+    deleted_contracts = Contract.objects.filter(contract_active=False)
+    return render(request,
+                  template_name='contracts/deleted_contracts.html',
+                  context={'contracts': deleted_contracts,
+                           })
 
 class DeletedContracts(View):
     ''' render deleted contracts and allow to recover contract '''

@@ -334,6 +334,11 @@ class Contract(models.Model):
         null=True,
         blank=True
     )
+    contract_delete_date = models.DateField(
+        verbose_name="дата удаления договора",
+        null=True,
+        blank=True
+    )
     plan_load_date_ASEZ = models.DateField(
         verbose_name="планируемая дата загрузки в АСЭЗ",
     )
