@@ -102,7 +102,7 @@
 
     {% for con_sum in contract_and_sum %}
         <tr>
-            <td><input type="checkbox" value="{{ con_sum.contract.id }}" class="contract_choice"><a href="{{ con_sum.contract.get_absolute_url }}" id="{{ con_sum.contract.id }}">{{ con_sum.contract.title }}</a></td>
+            <td><input type="checkbox" value="{{ con_sum.contract.id }}" class="contract_choice"><a href="{{ con_sum.contract.get_absolute_url }}" id="{{ contract.id }}">{{ con_sum.contract.title }}</a></td>
             <td>{{ con_sum.contract.finance_cost }}</td>
             <td>{{ con_sum.contract.activity_form }}</td>
             <td>{{ con_sum.contract.curator }}</td>

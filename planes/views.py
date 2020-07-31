@@ -223,9 +223,11 @@ class ContractView(View):
 
 def deleted_contract_render(request):
     deleted_contracts = Contract.objects.filter(contract_active=False)
+    conterparts = Counterpart.objects.all()
     return render(request,
                   template_name='contracts/deleted_contracts.html',
                   context={'contracts': deleted_contracts,
+                           'counterparts': conterparts,
                            })
 
 class DeletedContracts(View):
