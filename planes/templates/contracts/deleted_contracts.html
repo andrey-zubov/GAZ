@@ -12,9 +12,11 @@
         bottom: 30px;
         right: 30px;
         padding: 20px;
-        border: 1px solid #000;
 }
-
+    .contract_name {
+    text-align: left;
+    padding: 20px;
+}
 
 </style>
 <table border="1">
@@ -33,7 +35,7 @@
 
 {% for name in contracts %}
 <tr>
-        <th><input type="checkbox"><a href="{{ name.get_absolute_url }}" id="{{ name.id }}">Договор {{ name.title }}</a></th>
+        <th class="contract_name"><input type="checkbox"><a href="{{ name.get_absolute_url }}" id="{{ name.id }}">Договор {{ name.title }}</a></th>
         <th>{{ name.finance_cost }}</th>
         <th>{{ name.activity_form}}</th>
         <th>{{ name.curator }}</th>
